@@ -12,7 +12,6 @@ export const FFI_INT8 = 'int8'
 export const FFI_INT64 = 'int64'
 export const FFI_UINT = 'uint'
 export const FFI_UINT8 = 'uint8'
-
 export const FFI_INT8_PTR = ref.refType(FFI_INT8)
 
 const CStruct = struct(ref)
@@ -27,7 +26,7 @@ export const ByteBufferStructPtr = ref.refType(ByteBufferStruct)
 
 export const FfiList_FfiStrStruct = CStruct({
   count: ref.types.size_t,
-  data: FFI_STRING_PTR
+  data: ref.refType(CArray(ref.types.uint8))
 })
 
 export const FfiList_i64Struct = CStruct({
@@ -36,50 +35,50 @@ export const FfiList_i64Struct = CStruct({
 })
 
 export const FfiCredRevInfoStruct = CStruct({
-  reg_def: FFI_OBJECT_HANDLE,
-  reg_def_private: FFI_OBJECT_HANDLE,
-  registry: FFI_OBJECT_HANDLE,
-  reg_idx: FFI_INT64,
+  reg_def: ref.types.size_t,
+  reg_def_private: ref.types.size_t,
+  registry: ref.types.size_t,
+  reg_idx: ref.types.int64,
   reg_used: FfiList_i64Struct,
-  tails_path: FFI_STRING
+  tails_path: CArray(ref.types.uint8)
 })
 
 export const FfiCredentialEntryStruct = CStruct({
-  credential: FFI_OBJECT_HANDLE,
-  timestamp: FFI_INT64,
-  rev_state: FFI_OBJECT_HANDLE
+  credential: ref.types.size_t,
+  timestamp: ref.types.int64,
+  rev_state: ref.types.size_t
 })
 
 export const FfiList_FfiCredentialEntryStruct = CStruct({
-  count: FFI_UINT,
+  count: ref.types.size_t,
   data: ref.refType(FfiCredentialEntryStruct)
 })
 
 export const FfiCredentialProveStruct = CStruct({
-  entry_idx: FFI_INT64,
-  referent: FFI_STRING,
-  is_predictable: FFI_INT8,
-  reveal: FFI_INT8 
+  entry_idx: ref.types.int64,
+  referent: CArray(ref.types.uint8),
+  is_predictable: ref.types.int8,
+  reveal: ref.types.int8 
 })
 
 export const FfiList_FfiCredentialProveStruct = CStruct({
-  count: FFI_UINT,
+  count: ref.types.size_t,
   data: ref.refType(FfiCredentialProveStruct)
 })
 
 export const FfiList_ObjectHandleStruct = CStruct({
-  count: FFI_UINT,
-  data: FFI_OBJECT_HANDLE_PTR
+  count: ref.types.size_t,
+  data: ref.refType(ref.types.size_t)
 })
 
 export const FfiRevocationEntryStruct = CStruct({
-  def_entry_idx: FFI_INT64,
-  entry: FFI_OBJECT_HANDLE,
+  def_entry_idx: ref.types.int64,
+  entry: ref.types.size_t,
   timestamp: ref.types.int64
 })
 
 export const FfiList_FfiRevocationEntryStruct = CStruct({
-  count: FFI_UINT,
+  count: ref.types.size_t,
   data: ref.refType(FfiRevocationEntryStruct)
 })
 
