@@ -24,62 +24,62 @@ export const ByteBufferStruct = CStruct({
 
 export const ByteBufferStructPtr = ref.refType(ByteBufferStruct)
 
-export const FfiList_FfiStrStruct = CStruct({
+export const StringListStruct = CStruct({
   count: ref.types.size_t,
   data: ref.refType(CArray(ref.types.uint8))
 })
 
-export const FfiList_i64Struct = CStruct({
+export const I64ListStruct = CStruct({
   count: ref.types.size_t,
   data: ref.refType(CArray(ref.types.int64))
 })
 
-export const FfiCredRevInfoStruct = CStruct({
+export const CredRevInfoStruct = CStruct({
   reg_def: ref.types.size_t,
   reg_def_private: ref.types.size_t,
   registry: ref.types.size_t,
   reg_idx: ref.types.int64,
-  reg_used: FfiList_i64Struct,
+  reg_used: I64ListStruct,
   tails_path: CArray(ref.types.uint8)
 })
 
-export const FfiCredentialEntryStruct = CStruct({
+export const CredentialEntryStruct = CStruct({
   credential: ref.types.size_t,
   timestamp: ref.types.int64,
   rev_state: ref.types.size_t
 })
 
-export const FfiList_FfiCredentialEntryStruct = CStruct({
+export const CredentialEntryListStruct = CStruct({
   count: ref.types.size_t,
-  data: ref.refType(FfiCredentialEntryStruct)
+  data: ref.refType(CredentialEntryStruct)
 })
 
-export const FfiCredentialProveStruct = CStruct({
+export const CredentialProveStruct = CStruct({
   entry_idx: ref.types.int64,
   referent: CArray(ref.types.uint8),
   is_predictable: ref.types.int8,
   reveal: ref.types.int8 
 })
 
-export const FfiList_FfiCredentialProveStruct = CStruct({
+export const CredentialListProveStruct = CStruct({
   count: ref.types.size_t,
-  data: ref.refType(FfiCredentialProveStruct)
+  data: ref.refType(CredentialProveStruct)
 })
 
-export const FfiList_ObjectHandleStruct = CStruct({
+export const ObjectHandleListStruct = CStruct({
   count: ref.types.size_t,
   data: ref.refType(ref.types.size_t)
 })
 
-export const FfiRevocationEntryStruct = CStruct({
+export const RevocationEntryStruct = CStruct({
   def_entry_idx: ref.types.int64,
   entry: ref.types.size_t,
   timestamp: ref.types.int64
 })
 
-export const FfiList_FfiRevocationEntryStruct = CStruct({
+export const RevocationEntryListStruct = CStruct({
   count: ref.types.size_t,
-  data: ref.refType(FfiRevocationEntryStruct)
+  data: ref.refType(RevocationEntryStruct)
 })
 
 export const nativeBindings = {
@@ -90,10 +90,10 @@ export const nativeBindings = {
     FFI_OBJECT_HANDLE, 
     FFI_OBJECT_HANDLE, 
     FFI_OBJECT_HANDLE, 
-    FfiList_FfiStrStruct, 
-    FfiList_FfiStrStruct, 
-    FfiList_FfiStrStruct,
-    ref.refType(FfiCredRevInfoStruct),
+    StringListStruct, 
+    StringListStruct, 
+    StringListStruct,
+    ref.refType(CredRevInfoStruct),
     FFI_OBJECT_HANDLE_PTR,
     FFI_OBJECT_HANDLE_PTR,
     FFI_OBJECT_HANDLE_PTR
@@ -132,13 +132,13 @@ export const nativeBindings = {
     FFI_OBJECT_HANDLE_PTR
   ]],
   credx_create_presentation: [FFI_ERRORCODE, [
-    FfiList_FfiCredentialEntryStruct,
-    FfiList_FfiCredentialProveStruct,
-    FfiList_FfiStrStruct,
-    FfiList_FfiStrStruct,
+    CredentialEntryListStruct,
+    CredentialListProveStruct,
+    StringListStruct,
+    StringListStruct,
     FFI_OBJECT_HANDLE,
-    FfiList_ObjectHandleStruct,
-    FfiList_ObjectHandleStruct,
+    ObjectHandleListStruct,
+    ObjectHandleListStruct,
     FFI_OBJECT_HANDLE_PTR
   ]],
   credx_create_revocation_registry: [FFI_ERRORCODE, [
@@ -158,7 +158,7 @@ export const nativeBindings = {
     FFI_STRING,
     FFI_STRING,
     FFI_STRING,
-    FfiList_FfiStrStruct,
+    StringListStruct,
     FFI_INT64,
     FFI_OBJECT_HANDLE_PTR
   ]],
@@ -168,7 +168,7 @@ export const nativeBindings = {
     FFI_STRING_PTR
   ]],
   credx_encode_credential_attributes: [FFI_ERRORCODE, [
-    FfiList_FfiStrStruct,
+    StringListStruct,
     FFI_STRING_PTR
   ]],
   credx_generate_nonce: [FFI_ERRORCODE, [FFI_STRING_PTR]],
@@ -211,18 +211,18 @@ export const nativeBindings = {
   credx_update_revocation_registry: [FFI_ERRORCODE, [
     FFI_OBJECT_HANDLE,
     FFI_OBJECT_HANDLE,
-    FfiList_i64Struct,
-    FfiList_i64Struct,
+    I64ListStruct,
+    I64ListStruct,
     FFI_OBJECT_HANDLE_PTR,
     FFI_OBJECT_HANDLE_PTR
   ]],
   credx_verify_presentation: [FFI_ERRORCODE, [
     FFI_OBJECT_HANDLE,
     FFI_OBJECT_HANDLE,
-    FfiList_ObjectHandleStruct,
-    FfiList_ObjectHandleStruct,
-    FfiList_ObjectHandleStruct,
-    FfiList_FfiRevocationEntryStruct,
+    ObjectHandleListStruct,
+    ObjectHandleListStruct,
+    ObjectHandleListStruct,
+    RevocationEntryListStruct,
     FFI_INT8_PTR
   ]],
   credx_version: [FFI_STRING, []],
