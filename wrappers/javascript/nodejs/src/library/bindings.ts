@@ -42,7 +42,16 @@ export const nativeBindings = {
   ],
   credx_create_credential_definition: [
     FFI_ERRORCODE,
-    [FFI_OBJECT_HANDLE, FFI_STRING, FFI_STRING, FFI_INT8, FFI_OBJECT_HANDLE, FFI_OBJECT_HANDLE],
+    [
+      FFI_STRING,
+      FFI_OBJECT_HANDLE,
+      FFI_STRING,
+      FFI_STRING,
+      FFI_INT8,
+      FFI_OBJECT_HANDLE_PTR,
+      FFI_OBJECT_HANDLE_PTR,
+      FFI_OBJECT_HANDLE_PTR,
+    ],
   ],
   credx_create_credential_offer: [
     FFI_ERRORCODE,

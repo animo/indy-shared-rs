@@ -70,7 +70,7 @@ export interface IndyCredx {
     revocationRegistry: ObjectHandle
     credentialRevocationIndex: number
     tailsPath: string
-  }): [ObjectHandle, ObjectHandle, ObjectHandle]
+  }): [ObjectHandle, ObjectHandle]
 
   createCredentialOffer(options: {
     schemaId: string
