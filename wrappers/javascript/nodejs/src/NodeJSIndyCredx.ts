@@ -1,6 +1,17 @@
 import type { CredentialEntry, CredentialProve, IndyCredx, RevocationEntry, ObjectHandle } from 'indy-credx-shared'
 
-import { allocateStringBuffer, allocatePointer, serializeArguments, StringListStruct } from './ffi'
+import { TextEncoder } from 'util'
+
+import {
+  allocateStringBuffer,
+  allocatePointer,
+  serializeArguments,
+  StringListStruct,
+  CredentialEntryStruct,
+  CredentialProveStruct,
+  CredentialEntryListStruct,
+  CredentialProveListStruct,
+} from './ffi'
 import { nativeIndyCredx } from './library'
 
 export class NodeJSIndyCredx implements IndyCredx {
@@ -240,12 +251,66 @@ export class NodeJSIndyCredx implements IndyCredx {
     presentationRequest: ObjectHandle
     credentials: CredentialEntry[]
     credentialsProve: CredentialProve[]
-    selfAttest: Record<string, string>[]
+    selfAttest: Record<string, string>
     masterSecret: ObjectHandle
     schemas: ObjectHandle[]
     credentialDefinitions: ObjectHandle[]
   }): ObjectHandle {
-    throw new Error('Method not implemented.')
+    const { presentationRequest, masterSecret } = serializeArguments(options)
+
+    const credentialEntries = options.credentials.map((value) => {
+      const { credential, timestamp, revocationState: rev_state } = serializeArguments(value)
+      return CredentialEntryStruct({ credential, timestamp, rev_state })
+    })
+
+    const credentialEntryList = CredentialEntryListStruct({
+      count: credentialEntries.length,
+      // @ts-ignore
+      data: credentialEntries,
+    })
+
+    const credentialProves = options.credentialsProve.map((value) => {
+      const { entryIndex: entry_idx, isPredicate: is_predictable, reveal } = serializeArguments(value)
+      const referent = new TextEncoder().encode(value.referent)
+
+      // @ts-ignore
+      return CredentialProveStruct({ entry_idx, referent, is_predictable, reveal })
+    })
+
+    const credentialProveList = CredentialProveListStruct({
+      count: credentialProves.length,
+      // @ts-ignore
+      data: credentialProves,
+    })
+
+    const selfAttestKeys = StringListStruct({
+      count: Object.keys(options.selfAttest).length,
+      // @ts-ignore
+      data: Object.keys(options.selfAttest),
+    })
+
+    const selfAttestValues = StringListStruct({
+      count: Object.values(options.selfAttest).length,
+      // @ts-ignore
+      data: Object.values(options.selfAttest),
+    })
+
+    const schemas = options.schemas.map((value) => value.handle)
+
+    const ret = allocatePointer()
+
+    nativeIndyCredx.credx_create_presentation(
+      presentationRequest,
+      credentialEntryList,
+      credentialProveList,
+      selfAttestKeys,
+      selfAttestValues,
+      masterSecret,
+      schemas,
+      ret
+    )
+
+    return ret.deref() as ObjectHandle
   }
   public verifyPresentation(options: {
     presentation: ObjectHandle

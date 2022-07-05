@@ -92,7 +92,7 @@ export interface IndyCredx {
     presentationRequest: ObjectHandle
     credentials: CredentialEntry[]
     credentialsProve: CredentialProve[]
-    selfAttest: Record<string, string>[]
+    selfAttest: Record<string, string>
     masterSecret: ObjectHandle
     schemas: ObjectHandle[]
     credentialDefinitions: ObjectHandle[]

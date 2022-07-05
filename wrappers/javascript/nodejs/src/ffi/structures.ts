@@ -50,9 +50,11 @@ export const CredentialEntryStruct = CStruct({
   rev_state: FFI_ISIZE,
 })
 
+export const CredentialEntryArray = CArray(CredentialEntryStruct)
+
 export const CredentialEntryListStruct = CStruct({
   count: FFI_ISIZE,
-  data: ref.refType(CredentialEntryStruct),
+  data: CredentialEntryArray,
 })
 
 export const CredentialProveStruct = CStruct({
@@ -62,9 +64,11 @@ export const CredentialProveStruct = CStruct({
   reveal: FFI_INT8,
 })
 
-export const CredentialListProveStruct = CStruct({
+export const CredentialProveArray = CArray(CredentialProveStruct)
+
+export const CredentialProveListStruct = CStruct({
   count: FFI_ISIZE,
-  data: ref.refType(CredentialProveStruct),
+  data: CredentialProveArray,
 })
 
 export const ObjectHandleListStruct = CStruct({
@@ -78,7 +82,9 @@ export const RevocationEntryStruct = CStruct({
   timestamp: FFI_INT64,
 })
 
+export const RevocationEntryArray = CArray(RevocationEntryStruct)
+
 export const RevocationEntryListStruct = CStruct({
   count: FFI_ISIZE,
-  data: ref.refType(RevocationEntryStruct),
+  data: RevocationEntryArray,
 })
