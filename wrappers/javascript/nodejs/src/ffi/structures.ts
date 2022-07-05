@@ -14,6 +14,8 @@ const FFI_INT64_ARRAY = CArray(FFI_INT64)
 const FFI_INT64_ARRAY_PTR = ref.refType(FFI_INT64_ARRAY)
 const FFI_UINT8_ARRAY_PTR = ref.refType(FFI_UINT8_ARRAY)
 
+export const Int64Array = FFI_INT64_ARRAY
+
 export const StringArrayPtr = ref.refType(StringArray)
 
 export const ByteBufferStruct = CStruct({

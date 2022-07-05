@@ -11,6 +11,12 @@ import {
   CredentialProveStruct,
   CredentialEntryListStruct,
   CredentialProveListStruct,
+  ObjectHandleListStruct,
+  RevocationEntryListStruct,
+  RevocationEntryStruct,
+  allocateInt8Buffer,
+  I64ListStruct,
+  Int64Array,
 } from './ffi'
 import { nativeIndyCredx } from './library'
 
@@ -91,10 +97,6 @@ export class NodeJSIndyCredx implements IndyCredx {
       revocationConfiguration,
     } = serializeArguments(options)
 
-    const ret1 = allocatePointer()
-    const ret2 = allocatePointer()
-    const ret3 = allocatePointer()
-
     const attributeNames = StringListStruct({
       count: options.attributeRawValues.length,
       // @ts-ignore
@@ -112,6 +114,10 @@ export class NodeJSIndyCredx implements IndyCredx {
       // @ts-ignore
       data: Object.values(options.attributeEncodedValues),
     })
+
+    const ret1 = allocatePointer()
+    const ret2 = allocatePointer()
+    const ret3 = allocatePointer()
 
     nativeIndyCredx.credx_create_credential(
       credentialDefinition,
@@ -131,13 +137,14 @@ export class NodeJSIndyCredx implements IndyCredx {
     return [ret1.deref() as ObjectHandle, ret2.deref() as ObjectHandle, ret3.deref() as ObjectHandle]
   }
   public encodeCredentialAttributes(attributeRawValues: Record<string, string>): Record<string, string> {
-    const ret = allocateStringBuffer()
 
     const rawValues = StringListStruct({
       count: Object.keys(attributeRawValues).length,
       // @ts-ignore
       data: Object.values(attributeRawValues),
     })
+
+    const ret = allocateStringBuffer()
 
     // @ts-ignore
     nativeIndyCredx.credx_encode_credential_attributes(rawValues, ret)
@@ -297,16 +304,20 @@ export class NodeJSIndyCredx implements IndyCredx {
 
     const schemas = options.schemas.map((value) => value.handle)
 
+    const credentialDefinitions = options.credentialDefinitions.map((value) => value.handle)
+
     const ret = allocatePointer()
 
     nativeIndyCredx.credx_create_presentation(
       presentationRequest,
+      // @ts-ignore
       credentialEntryList,
       credentialProveList,
       selfAttestKeys,
       selfAttestValues,
       masterSecret,
       schemas,
+      credentialDefinitions,
       ret
     )
 
@@ -320,8 +331,54 @@ export class NodeJSIndyCredx implements IndyCredx {
     revocationRegistryDefinitions: ObjectHandle[]
     revocationRegistries: RevocationEntry[]
   }): boolean {
-    throw new Error('Method not implemented.')
+    const { presentation, presentationRequest } = serializeArguments(options)
+
+    const schemas = ObjectHandleListStruct({
+      count: options.schemas.length,
+      // @ts-ignore
+      data: options.schemas.map((item) => item.handle),
+    })
+
+    const credentialDefinitions = ObjectHandleListStruct({
+      count: options.credentialDefinitions.length,
+      // @ts-ignore
+      data: options.credentialDefinitions.map((item) => item.handle),
+    })
+
+    const revocationRegistryDefinitions = ObjectHandleListStruct({
+      count: options.revocationRegistryDefinitions.length,
+      // @ts-ignore
+      data: options.revocationRegistryDefinitions.map((item) => item.handle),
+    })
+
+    const revocationRegistries = RevocationEntryListStruct({
+      count: options.revocationRegistries.length,
+      // @ts-ignore
+      data: options.revocationRegistries.map((item) =>
+        RevocationEntryStruct({
+          def_entry_idx: item.revocationRegistryDefinitionEntryIndex,
+          entry: item.entry.handle,
+          timestamp: item.timestamp,
+        })
+      ),
+    })
+
+    const ret = allocateInt8Buffer()
+
+    nativeIndyCredx.credx_verify_presentation(
+      presentation,
+      presentationRequest,
+      // @ts-ignore
+      schemas,
+      credentialDefinitions,
+      revocationRegistryDefinitions,
+      revocationRegistries,
+      ret
+    )
+
+    return Boolean(ret.deref() as number)
   }
+
   public createRevocationRegistry(options: {
     originDid: string
     credentialDefinition: ObjectHandle
@@ -331,7 +388,41 @@ export class NodeJSIndyCredx implements IndyCredx {
     maximumCredentialNumber: number
     tailsDirectoryPath?: string | undefined
   }): [ObjectHandle, ObjectHandle, ObjectHandle, ObjectHandle] {
-    throw new Error('Method not implemented.')
+    const {
+      originDid,
+      credentialDefinition,
+      tag,
+      revocationRegistryType,
+      issuanceType,
+      maximumCredentialNumber,
+      tailsDirectoryPath,
+    } = serializeArguments(options)
+
+    const ret1 = allocatePointer()
+    const ret2 = allocatePointer()
+    const ret3 = allocatePointer()
+    const ret4 = allocatePointer()
+
+    nativeIndyCredx.credx_create_revocation_registry(
+      originDid,
+      credentialDefinition,
+      tag,
+      revocationRegistryType,
+      issuanceType,
+      maximumCredentialNumber,
+      tailsDirectoryPath,
+      ret1,
+      ret2,
+      ret3,
+      ret4
+    )
+
+    return [
+      ret1.deref() as ObjectHandle,
+      ret2.deref() as ObjectHandle,
+      ret3.deref() as ObjectHandle,
+      ret4.deref() as ObjectHandle,
+    ]
   }
   public updateRevocationRegistry(options: {
     revocationRegistryDefinition: ObjectHandle
@@ -340,13 +431,48 @@ export class NodeJSIndyCredx implements IndyCredx {
     revoked: number[]
     tailsDirectoryPath: string
   }): [ObjectHandle, ObjectHandle] {
-    throw new Error('Method not implemented.')
+
+    const { revocationRegistryDefinition, revocationRegistry, tailsDirectoryPath } = serializeArguments(options)
+
+    const issued = I64ListStruct({
+      count: options.issued.length,
+      // @ts-ignore
+      data: Int64Array(options.issued),
+    })
+
+    const revoked = I64ListStruct({
+      count: options.revoked.length,
+      // @ts-ignore
+      data: Int64Array(options.revoked),
+    })
+
+    const ret1 = allocatePointer()
+    const ret2 = allocatePointer()
+
+    nativeIndyCredx.credx_update_revocation_registry(
+      revocationRegistryDefinition,
+      revocationRegistry,
+      // @ts-ignore
+      issued,
+      revoked,
+      tailsDirectoryPath,
+      ret1,
+      ret2
+    )
+
+    return [ret1.deref() as ObjectHandle, ret2.deref() as ObjectHandle]
   }
   public mergeRevocationRegistryDeltas(options: {
     revocationRegistryDelta1: ObjectHandle
     revocationRegistryDelta2: ObjectHandle
   }): ObjectHandle {
-    throw new Error('Method not implemented.')
+    const { revocationRegistryDelta1, revocationRegistryDelta2 } = serializeArguments(options)
+
+    const ret = allocatePointer()
+
+    nativeIndyCredx.credx_merge_revocation_registry_deltas(revocationRegistryDelta1, revocationRegistryDelta2, ret)
+
+    return ret.deref() as ObjectHandle
   }
   public createOrUpdateRevocationState(options: {
     revocationRegistryDefinition: ObjectHandle
@@ -356,7 +482,29 @@ export class NodeJSIndyCredx implements IndyCredx {
     tailsPath: string
     previousRevocationState?: ObjectHandle | undefined
   }): ObjectHandle {
-    throw new Error('Method not implemented.')
+    const {
+      revocationRegistryDefinition,
+      revocationRegistryDelta,
+      revocationRegistryIndex,
+      timestamp,
+      tailsPath,
+      previousRevocationState,
+    } = serializeArguments(options)
+
+    const ret = allocatePointer()
+
+    nativeIndyCredx.credx_create_or_update_revocation_state(
+      revocationRegistryDefinition,
+      revocationRegistryDelta,
+      revocationRegistryIndex,
+      timestamp,
+      tailsPath,
+      // @ts-ignore
+      previousRevocationState,
+      ret
+    )
+
+    return ret.deref() as ObjectHandle
   }
   public version(): string {
     return nativeIndyCredx.credx_version()
