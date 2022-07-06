@@ -1,8 +1,18 @@
-import type { CredentialEntry, CredentialProve, IndyCredx, RevocationEntry, ObjectHandle } from 'indy-credx-shared'
+import type {
+  CredentialEntry,
+  CredentialProve,
+  IndyCredx,
+  RevocationEntry,
+  CredentialRevocationConfig,
+} from 'indy-credx-shared'
 
-import { TextEncoder } from 'util'
+import { ObjectHandle } from 'indy-credx-shared'
+import { TextDecoder, TextEncoder } from 'util'
+
+import { ByteBuffer } from '../../shared/src/types'
 
 import {
+  byteBufferToBuffer,
   allocateStringBuffer,
   allocatePointer,
   serializeArguments,
@@ -17,6 +27,8 @@ import {
   allocateInt8Buffer,
   I64ListStruct,
   Int64Array,
+  CredRevInfoStruct,
+  allocateByteBuffer,
 } from './ffi'
 import { nativeIndyCredx } from './library'
 
@@ -41,7 +53,7 @@ export class NodeJSIndyCredx implements IndyCredx {
     // @ts-ignore
     nativeIndyCredx.credx_create_schema(originDid, name, version, attributeNames, sequenceNumber, ret)
 
-    return ret.deref() as ObjectHandle
+    return new ObjectHandle(ret.deref() as number)
   }
 
   public schemaGetAttribute(options: { schema: ObjectHandle; name: string }) {
@@ -49,6 +61,24 @@ export class NodeJSIndyCredx implements IndyCredx {
 
     const ret = allocateStringBuffer()
     nativeIndyCredx.credx_schema_get_attribute(schema, name, ret)
+
+    return ret.deref() as string
+  }
+
+  public revocationRegistryDefinitionGetAttribute(options: { object: ObjectHandle; name: string }) {
+    const { object, name } = serializeArguments(options)
+
+    const ret = allocateStringBuffer()
+    nativeIndyCredx.credx_revocation_registry_definition_get_attribute(object, name, ret)
+
+    return ret.deref() as string
+  }
+
+  public credentialGetAttribute(options: { object: ObjectHandle; name: string }) {
+    const { object, name } = serializeArguments(options)
+
+    const ret = allocateStringBuffer()
+    nativeIndyCredx.credx_credential_get_attribute(object, name, ret)
 
     return ret.deref() as string
   }
@@ -77,7 +107,11 @@ export class NodeJSIndyCredx implements IndyCredx {
       ret3
     )
 
-    return [ret1.deref() as ObjectHandle, ret2.deref() as ObjectHandle, ret3.deref() as ObjectHandle]
+    return [
+      new ObjectHandle(ret1.deref() as number),
+      new ObjectHandle(ret2.deref() as number),
+      new ObjectHandle(ret3.deref() as number),
+    ]
   }
 
   public createCredential(options: {
@@ -87,34 +121,57 @@ export class NodeJSIndyCredx implements IndyCredx {
     credentialRequest: ObjectHandle
     attributeRawValues: Record<string, string>
     attributeEncodedValues?: Record<string, string> | undefined
-    revocationConfiguration?: Record<string, string> | undefined
+    revocationConfiguration?: CredentialRevocationConfig | undefined
   }): [ObjectHandle, ObjectHandle, ObjectHandle] {
-    const {
-      credentialDefinition,
-      credentialDefinitionPrivate,
-      credentialOffer,
-      credentialRequest,
-      revocationConfiguration,
-    } = serializeArguments(options)
+    const { credentialDefinition, credentialDefinitionPrivate, credentialOffer, credentialRequest } =
+      serializeArguments(options)
 
     const attributeNames = StringListStruct({
-      count: options.attributeRawValues.length,
+      count: Object.keys(options.attributeRawValues).length,
       // @ts-ignore
       data: Object.keys(options.attributeRawValues),
     })
 
     const attributeRawValues = StringListStruct({
-      count: options.attributeRawValues.length,
+      count: Object.keys(options.attributeRawValues).length,
       // @ts-ignore
       data: Object.values(options.attributeRawValues),
     })
 
-    const attributeEncodedValues = StringListStruct({
-      count: options.attributeRawValues.length,
-      // @ts-ignore
-      data: Object.values(options.attributeEncodedValues),
-    })
+    const attributeEncodedValues = options.attributeEncodedValues
+      ? StringListStruct({
+          count: Object.keys(options.attributeEncodedValues).length,
+          // @ts-ignore
+          data: Object.values(options.attributeEncodedValues),
+        })
+      : undefined
 
+    let revocationConfiguration = CredRevInfoStruct()
+    if (options.revocationConfiguration) {
+      const { registry, registryDefinition, registryDefinitionPrivate, registryIndex, tailsPath } = serializeArguments(
+        options.revocationConfiguration
+      )
+
+      let registryUsed
+
+      if (options.revocationConfiguration.registryUsed) {
+        registryUsed = I64ListStruct({
+          count: options.revocationConfiguration.registryUsed.length,
+          // @ts-ignore
+          data: Int64Array(options.revocationConfiguration.registryUsed),
+        })
+      }
+
+      revocationConfiguration = CredRevInfoStruct({
+        reg_def: registryDefinition,
+        reg_def_private: registryDefinitionPrivate,
+        registry: registry,
+        reg_idx: registryIndex,
+        reg_used: registryUsed,
+        // @ts-ignore
+        tails_path: tailsPath,
+      })
+    }
     const ret1 = allocatePointer()
     const ret2 = allocatePointer()
     const ret3 = allocatePointer()
@@ -128,16 +185,19 @@ export class NodeJSIndyCredx implements IndyCredx {
       attributeNames,
       attributeRawValues,
       attributeEncodedValues,
-      revocationConfiguration,
+      revocationConfiguration.ref(),
       ret1,
       ret2,
       ret3
     )
 
-    return [ret1.deref() as ObjectHandle, ret2.deref() as ObjectHandle, ret3.deref() as ObjectHandle]
+    return [
+      new ObjectHandle(ret1.deref() as number),
+      new ObjectHandle(ret1.deref() as number),
+      new ObjectHandle(ret1.deref() as number),
+    ]
   }
   public encodeCredentialAttributes(attributeRawValues: Record<string, string>): Record<string, string> {
-
     const rawValues = StringListStruct({
       count: Object.keys(attributeRawValues).length,
       // @ts-ignore
@@ -181,7 +241,7 @@ export class NodeJSIndyCredx implements IndyCredx {
       ret
     )
 
-    return ret.deref() as ObjectHandle
+    return new ObjectHandle(ret.deref() as number)
   }
   public revokeCredential(options: {
     revocationRegistryDefinition: ObjectHandle
@@ -204,7 +264,7 @@ export class NodeJSIndyCredx implements IndyCredx {
       ret2
     )
 
-    return [ret1.deref() as ObjectHandle, ret2.deref() as ObjectHandle]
+    return [new ObjectHandle(ret1.deref() as number), new ObjectHandle(ret2.deref() as number)]
   }
 
   public createCredentialOffer(options: {
@@ -217,7 +277,7 @@ export class NodeJSIndyCredx implements IndyCredx {
     const ret = allocatePointer()
     nativeIndyCredx.credx_create_credential_offer(schemaId, credentialDefinition, keyProof, ret)
 
-    return ret.deref() as ObjectHandle
+    return new ObjectHandle(ret.deref() as number)
   }
 
   public createCredentialRequest(options: {
@@ -243,7 +303,7 @@ export class NodeJSIndyCredx implements IndyCredx {
       ret2
     )
 
-    return [ret1.deref() as ObjectHandle, ret2.deref() as ObjectHandle]
+    return [new ObjectHandle(ret1.deref() as number), new ObjectHandle(ret2.deref() as number)]
   }
 
   public createMasterSecret(): ObjectHandle {
@@ -251,7 +311,7 @@ export class NodeJSIndyCredx implements IndyCredx {
 
     nativeIndyCredx.credx_create_master_secret(ret)
 
-    return ret.deref() as ObjectHandle
+    return new ObjectHandle(ret.deref() as number)
   }
 
   public createPresentation(options: {
@@ -321,7 +381,7 @@ export class NodeJSIndyCredx implements IndyCredx {
       ret
     )
 
-    return ret.deref() as ObjectHandle
+    return new ObjectHandle(ret.deref() as number)
   }
   public verifyPresentation(options: {
     presentation: ObjectHandle
@@ -418,10 +478,10 @@ export class NodeJSIndyCredx implements IndyCredx {
     )
 
     return [
-      ret1.deref() as ObjectHandle,
-      ret2.deref() as ObjectHandle,
-      ret3.deref() as ObjectHandle,
-      ret4.deref() as ObjectHandle,
+      new ObjectHandle(ret1.deref() as number),
+      new ObjectHandle(ret2.deref() as number),
+      new ObjectHandle(ret3.deref() as number),
+      new ObjectHandle(ret4.deref() as number),
     ]
   }
   public updateRevocationRegistry(options: {
@@ -431,7 +491,6 @@ export class NodeJSIndyCredx implements IndyCredx {
     revoked: number[]
     tailsDirectoryPath: string
   }): [ObjectHandle, ObjectHandle] {
-
     const { revocationRegistryDefinition, revocationRegistry, tailsDirectoryPath } = serializeArguments(options)
 
     const issued = I64ListStruct({
@@ -460,7 +519,7 @@ export class NodeJSIndyCredx implements IndyCredx {
       ret2
     )
 
-    return [ret1.deref() as ObjectHandle, ret2.deref() as ObjectHandle]
+    return [new ObjectHandle(ret1.deref() as number), new ObjectHandle(ret2.deref() as number)]
   }
   public mergeRevocationRegistryDeltas(options: {
     revocationRegistryDelta1: ObjectHandle
@@ -472,8 +531,9 @@ export class NodeJSIndyCredx implements IndyCredx {
 
     nativeIndyCredx.credx_merge_revocation_registry_deltas(revocationRegistryDelta1, revocationRegistryDelta2, ret)
 
-    return ret.deref() as ObjectHandle
+    return new ObjectHandle(ret.deref() as number)
   }
+
   public createOrUpdateRevocationState(options: {
     revocationRegistryDefinition: ObjectHandle
     revocationRegistryDelta: ObjectHandle
@@ -482,15 +542,10 @@ export class NodeJSIndyCredx implements IndyCredx {
     tailsPath: string
     previousRevocationState?: ObjectHandle | undefined
   }): ObjectHandle {
-    const {
-      revocationRegistryDefinition,
-      revocationRegistryDelta,
-      revocationRegistryIndex,
-      timestamp,
-      tailsPath,
-      previousRevocationState,
-    } = serializeArguments(options)
+    const { revocationRegistryDefinition, revocationRegistryDelta, revocationRegistryIndex, timestamp, tailsPath } =
+      serializeArguments(options)
 
+    const previousRevocationState = options.previousRevocationState ?? new ObjectHandle(0)
     const ret = allocatePointer()
 
     nativeIndyCredx.credx_create_or_update_revocation_state(
@@ -500,11 +555,11 @@ export class NodeJSIndyCredx implements IndyCredx {
       timestamp,
       tailsPath,
       // @ts-ignore
-      previousRevocationState,
+      previousRevocationState.handle,
       ret
     )
 
-    return ret.deref() as ObjectHandle
+    return new ObjectHandle(ret.deref() as number)
   }
   public version(): string {
     return nativeIndyCredx.credx_version()
@@ -515,5 +570,41 @@ export class NodeJSIndyCredx implements IndyCredx {
     const ret = allocateStringBuffer()
     nativeIndyCredx.credx_get_current_error(ret)
     return ret.deref() as string
+  }
+
+  public presentationRequestFromJson(options: { json: string }) {
+    const ret = allocatePointer()
+
+    const byteBuffer = ByteBuffer.fromUint8Array(new TextEncoder().encode(options.json))
+
+    // @ts-ignore
+    nativeIndyCredx.credx_presentation_request_from_json(byteBuffer, ret)
+
+    return new ObjectHandle(ret.deref() as number)
+  }
+
+  public getJson(options: { object: ObjectHandle }) {
+    const ret = allocateByteBuffer()
+
+    const { object } = serializeArguments(options)
+    nativeIndyCredx.credx_object_get_json(object, ret)
+
+    const output = new Uint8Array(byteBufferToBuffer(ret.deref()))
+
+    return new TextDecoder().decode(output)
+  }
+
+  public getTypeName(options: { object: ObjectHandle }) {
+    const { object } = serializeArguments(options)
+
+    const ret = allocateStringBuffer()
+
+    nativeIndyCredx.credx_object_get_type_name(object, ret)
+
+    return ret.deref() as string
+  }
+
+  public objectFree(options: { object: ObjectHandle }) {
+    nativeIndyCredx.credx_object_free(options.object.handle)
   }
 }
