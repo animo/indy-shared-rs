@@ -126,11 +126,11 @@ const run = () => {
   console.log(`Presentation Request from JSON error: ${credx.getCurrentError()}`)
 
   console.log(`Presentation Request type name: ${credx.getTypeName({ object: presRequestObj })}`)
-  console.log(`Presentation Request type name: ${presRequestObj.typeName()}`)
+  console.log(`Presentation Request type name: ${presRequestObj.typeName()})}`)
 
   const json = credx.getJson({ object: presRequestObj })
 
-  console.log(`Presentation Request JSON. Length ${json.length}: ${json}`)
+  //console.log(`Presentation Request JSON. Length ${json.length}: ${json}`)
 
   const revRegIndex = credx.credentialGetAttribute({
     object: cred,

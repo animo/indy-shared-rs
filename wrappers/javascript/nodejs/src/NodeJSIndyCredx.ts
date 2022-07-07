@@ -11,6 +11,7 @@ import { TextDecoder, TextEncoder } from 'util'
 
 import { ByteBuffer } from '../../shared/src/types'
 
+import { handleError } from './error'
 import {
   byteBufferToBuffer,
   allocateStringBuffer,
@@ -36,6 +37,8 @@ export class NodeJSIndyCredx implements IndyCredx {
   public generateNonce(): string {
     const ret = allocateStringBuffer()
     nativeIndyCredx.credx_generate_nonce(ret)
+    handleError()
+
     return ret.deref() as string
   }
 
@@ -52,6 +55,7 @@ export class NodeJSIndyCredx implements IndyCredx {
 
     // @ts-ignore
     nativeIndyCredx.credx_create_schema(originDid, name, version, attributeNames, sequenceNumber, ret)
+    handleError()
 
     return new ObjectHandle(ret.deref() as number)
   }
@@ -61,6 +65,7 @@ export class NodeJSIndyCredx implements IndyCredx {
 
     const ret = allocateStringBuffer()
     nativeIndyCredx.credx_schema_get_attribute(schema, name, ret)
+    handleError()
 
     return ret.deref() as string
   }
@@ -70,6 +75,7 @@ export class NodeJSIndyCredx implements IndyCredx {
 
     const ret = allocateStringBuffer()
     nativeIndyCredx.credx_revocation_registry_definition_get_attribute(object, name, ret)
+    handleError()
 
     return ret.deref() as string
   }
@@ -79,6 +85,7 @@ export class NodeJSIndyCredx implements IndyCredx {
 
     const ret = allocateStringBuffer()
     nativeIndyCredx.credx_credential_get_attribute(object, name, ret)
+    handleError()
 
     return ret.deref() as string
   }
@@ -106,6 +113,7 @@ export class NodeJSIndyCredx implements IndyCredx {
       ret2,
       ret3
     )
+    handleError()
 
     return [
       new ObjectHandle(ret1.deref() as number),
@@ -190,6 +198,7 @@ export class NodeJSIndyCredx implements IndyCredx {
       ret2,
       ret3
     )
+    handleError()
 
     return [
       new ObjectHandle(ret1.deref() as number),
@@ -208,6 +217,7 @@ export class NodeJSIndyCredx implements IndyCredx {
 
     // @ts-ignore
     nativeIndyCredx.credx_encode_credential_attributes(rawValues, ret)
+    handleError()
 
     const result = ret.deref() as string
 
@@ -240,6 +250,7 @@ export class NodeJSIndyCredx implements IndyCredx {
       revocationRegistryDefinition,
       ret
     )
+    handleError()
 
     return new ObjectHandle(ret.deref() as number)
   }
@@ -263,6 +274,7 @@ export class NodeJSIndyCredx implements IndyCredx {
       ret1,
       ret2
     )
+    handleError()
 
     return [new ObjectHandle(ret1.deref() as number), new ObjectHandle(ret2.deref() as number)]
   }
@@ -276,6 +288,7 @@ export class NodeJSIndyCredx implements IndyCredx {
 
     const ret = allocatePointer()
     nativeIndyCredx.credx_create_credential_offer(schemaId, credentialDefinition, keyProof, ret)
+    handleError()
 
     return new ObjectHandle(ret.deref() as number)
   }
@@ -302,6 +315,7 @@ export class NodeJSIndyCredx implements IndyCredx {
       ret1,
       ret2
     )
+    handleError()
 
     return [new ObjectHandle(ret1.deref() as number), new ObjectHandle(ret2.deref() as number)]
   }
@@ -310,6 +324,7 @@ export class NodeJSIndyCredx implements IndyCredx {
     const ret = allocatePointer()
 
     nativeIndyCredx.credx_create_master_secret(ret)
+    handleError()
 
     return new ObjectHandle(ret.deref() as number)
   }
@@ -380,6 +395,7 @@ export class NodeJSIndyCredx implements IndyCredx {
       credentialDefinitions,
       ret
     )
+    handleError()
 
     return new ObjectHandle(ret.deref() as number)
   }
@@ -435,6 +451,7 @@ export class NodeJSIndyCredx implements IndyCredx {
       revocationRegistries,
       ret
     )
+    handleError()
 
     return Boolean(ret.deref() as number)
   }
@@ -476,6 +493,7 @@ export class NodeJSIndyCredx implements IndyCredx {
       ret3,
       ret4
     )
+    handleError()
 
     return [
       new ObjectHandle(ret1.deref() as number),
@@ -518,6 +536,7 @@ export class NodeJSIndyCredx implements IndyCredx {
       ret1,
       ret2
     )
+    handleError()
 
     return [new ObjectHandle(ret1.deref() as number), new ObjectHandle(ret2.deref() as number)]
   }
@@ -530,6 +549,7 @@ export class NodeJSIndyCredx implements IndyCredx {
     const ret = allocatePointer()
 
     nativeIndyCredx.credx_merge_revocation_registry_deltas(revocationRegistryDelta1, revocationRegistryDelta2, ret)
+    handleError()
 
     return new ObjectHandle(ret.deref() as number)
   }
@@ -558,6 +578,7 @@ export class NodeJSIndyCredx implements IndyCredx {
       previousRevocationState.handle,
       ret
     )
+    handleError()
 
     return new ObjectHandle(ret.deref() as number)
   }
@@ -569,6 +590,8 @@ export class NodeJSIndyCredx implements IndyCredx {
   public getCurrentError(): string {
     const ret = allocateStringBuffer()
     nativeIndyCredx.credx_get_current_error(ret)
+    handleError()
+
     return ret.deref() as string
   }
 
@@ -576,6 +599,7 @@ export class NodeJSIndyCredx implements IndyCredx {
     const ret = allocatePointer()
 
     const byteBuffer = ByteBuffer.fromUint8Array(new TextEncoder().encode(options.json))
+    handleError()
 
     // @ts-ignore
     nativeIndyCredx.credx_presentation_request_from_json(byteBuffer, ret)
@@ -588,6 +612,7 @@ export class NodeJSIndyCredx implements IndyCredx {
 
     const { object } = serializeArguments(options)
     nativeIndyCredx.credx_object_get_json(object, ret)
+    handleError()
 
     const output = new Uint8Array(byteBufferToBuffer(ret.deref()))
 
@@ -600,11 +625,13 @@ export class NodeJSIndyCredx implements IndyCredx {
     const ret = allocateStringBuffer()
 
     nativeIndyCredx.credx_object_get_type_name(object, ret)
+    handleError()
 
     return ret.deref() as string
   }
 
   public objectFree(options: { object: ObjectHandle }) {
     nativeIndyCredx.credx_object_free(options.object.handle)
+    handleError()
   }
 }
