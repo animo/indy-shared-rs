@@ -338,7 +338,7 @@ export class NodeJSIndyCredx implements IndyCredx {
     schemas: ObjectHandle[]
     credentialDefinitions: ObjectHandle[]
   }): ObjectHandle {
-    const { presentationRequest, masterSecret } = serializeArguments(options)
+    const { presentationRequest, masterSecret, schemas, credentialDefinitions } = serializeArguments(options)
 
     const credentialEntries = options.credentials.map((value) => {
       const { credential, timestamp, revocationState: rev_state } = serializeArguments(value)
@@ -376,18 +376,6 @@ export class NodeJSIndyCredx implements IndyCredx {
       data: Object.values(options.selfAttest),
     })
 
-    const schemas = ObjectHandleListStruct({
-      count: options.schemas.length,
-      // @ts-ignore
-      data: options.schemas.map((item) => item.handle),
-    })
-
-    const credentialDefinitions = ObjectHandleListStruct({
-      count: options.credentialDefinitions.length,
-      // @ts-ignore
-      data: options.credentialDefinitions.map((item) => item.handle),
-    })
-
     const ret = allocatePointer()
 
     nativeIndyCredx.credx_create_presentation(
@@ -414,25 +402,8 @@ export class NodeJSIndyCredx implements IndyCredx {
     revocationRegistryDefinitions: ObjectHandle[]
     revocationRegistries: RevocationEntry[]
   }): boolean {
-    const { presentation, presentationRequest } = serializeArguments(options)
-
-    const schemas = ObjectHandleListStruct({
-      count: options.schemas.length,
-      // @ts-ignore
-      data: options.schemas.map((item) => item.handle),
-    })
-
-    const credentialDefinitions = ObjectHandleListStruct({
-      count: options.credentialDefinitions.length,
-      // @ts-ignore
-      data: options.credentialDefinitions.map((item) => item.handle),
-    })
-
-    const revocationRegistryDefinitions = ObjectHandleListStruct({
-      count: options.revocationRegistryDefinitions.length,
-      // @ts-ignore
-      data: options.revocationRegistryDefinitions.map((item) => item.handle),
-    })
+    const { presentation, presentationRequest, schemas, credentialDefinitions, revocationRegistryDefinitions } =
+      serializeArguments(options)
 
     const revocationRegistries = RevocationEntryListStruct({
       count: options.revocationRegistries.length,
@@ -516,19 +487,7 @@ export class NodeJSIndyCredx implements IndyCredx {
     revoked: number[]
     tailsDirectoryPath: string
   }): [ObjectHandle, ObjectHandle] {
-    const { revocationRegistryDefinition, revocationRegistry, tailsDirectoryPath } = serializeArguments(options)
-
-    const issued = I64ListStruct({
-      count: options.issued.length,
-      // @ts-ignore
-      data: Int64Array(options.issued),
-    })
-
-    const revoked = I64ListStruct({
-      count: options.revoked.length,
-      // @ts-ignore
-      data: Int64Array(options.revoked),
-    })
+    const { revocationRegistryDefinition, revocationRegistry, tailsDirectoryPath, issued, revoked } = serializeArguments(options)
 
     const ret1 = allocatePointer()
     const ret2 = allocatePointer()

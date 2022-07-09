@@ -3,7 +3,7 @@ import type { ByteBufferStruct } from './structures'
 import { ObjectHandle } from 'indy-credx-shared'
 import { NULL } from 'ref-napi'
 
-import { StringListStruct } from './structures'
+import { ObjectHandleListStruct, StringListStruct } from './structures'
 
 type Argument =
   | Record<string, unknown>
@@ -72,11 +72,18 @@ const serialize = (arg: Argument): SerializedArgument => {
     case 'object':
       if (arg instanceof ObjectHandle) {
         return arg.handle
-      } else if (Array.isArray(arg) && arg.every((it) => typeof it === 'string')) {
-        // @ts-ignore
-        return StringListStruct({ count: arg.length, data: arg })
+      } else if (Array.isArray(arg)) {
+        if (arg.every((it) => typeof it === 'string')) {
+          // @ts-ignore
+          return StringListStruct({ count: arg.length, data: arg })
+        } else if (arg.every((it) => it instanceof ObjectHandle)) {
+          // @ts-ignore
+          return ObjectHandleListStruct({ count: arg.length, data: arg.map((item: ObjectHandle) => item.handle) })
+        } else if (arg.every((it) => typeof it === 'number')) {
+          // @ts-ignore
+          return I64ListStruct({ count: arg.length, data: Int64Array(arg) })
+        }
       }
-
       // TODO: add more serialization here for classes and uint8arrays
       return JSON.stringify(arg)
     default:
