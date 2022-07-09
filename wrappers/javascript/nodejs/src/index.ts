@@ -17,7 +17,7 @@ const run = () => {
     originDid: '55GkHamhTU1ZbTbV2ab9DE',
     version: '1',
     sequenceNumber: 1,
-    attributeNames: ['attr-1', 'attr-2'],
+    attributeNames: ['attr-1'],
   })
   console.log(`Create Schema error:  ${credx.getCurrentError()}`)
 
@@ -113,7 +113,11 @@ const run = () => {
       nonce: '1234',
       requested_attributes: {
         reft: {
-          name: 'attr',
+          name: 'attr-1',
+          non_revoked: { from: timestamp, to: timestamp },
+        },
+        name: {
+          name: 'name',
           non_revoked: { from: timestamp, to: timestamp },
         },
       },
@@ -151,6 +155,50 @@ const run = () => {
   })
 
   console.log(`Create Revocation State error: ${credx.getCurrentError()}`)
+
+  const presentationObj = credx.createPresentation({
+    presentationRequest: presRequestObj,
+    credentials: [
+      {
+        credential: cred,
+        revocationState,
+        timestamp,
+      },
+    ],
+    credentialDefinitions: [credDefObj],
+    credentialsProve: [
+      {
+        entryIndex: 0,
+        isPredicate: false,
+        referent: 'reft',
+        reveal: true,
+      },
+    ],
+    masterSecret,
+    schemas: [schemaObj],
+    selfAttest: { name: 'value' },
+  })
+
+  console.log(`presentation object: ${presentationObj.handle}`)
+
+  const presentationJson = credx.getJson({ object: presentationObj })
+
+  console.log(`Presentation Object JSON. Length ${presentationJson.length}: ${presentationJson}`)
+
+  credx.verifyPresentation({
+    presentation: presentationObj,
+    presentationRequest: presRequestObj,
+    credentialDefinitions: [credDefObj],
+    revocationRegistryDefinitions: [revRegDef],
+    revocationRegistries: [
+      {
+        entry: revReg,
+        revocationRegistryDefinitionEntryIndex: 0,
+        timestamp,
+      },
+    ],
+    schemas: [schemaObj],
+  })
 }
 
 run()

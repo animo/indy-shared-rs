@@ -65,7 +65,7 @@ export const CredentialEntryListStruct = CStruct({
 
 export const CredentialProveStruct = CStruct({
   entry_idx: FFI_INT64,
-  referent: FFI_UINT8_ARRAY,
+  referent: FFI_STRING,
   is_predictable: FFI_INT8,
   reveal: FFI_INT8,
 })
@@ -77,9 +77,11 @@ export const CredentialProveListStruct = CStruct({
   data: CredentialProveArray,
 })
 
+export const ObjectHandleArray = CArray('size_t')
+
 export const ObjectHandleListStruct = CStruct({
   count: FFI_ISIZE,
-  data: FFI_ISIZE_PTR,
+  data: ObjectHandleArray,
 })
 
 export const RevocationEntryStruct = CStruct({

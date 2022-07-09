@@ -352,8 +352,7 @@ export class NodeJSIndyCredx implements IndyCredx {
     })
 
     const credentialProves = options.credentialsProve.map((value) => {
-      const { entryIndex: entry_idx, isPredicate: is_predictable, reveal } = serializeArguments(value)
-      const referent = new TextEncoder().encode(value.referent)
+      const { entryIndex: entry_idx, isPredicate: is_predictable, reveal, referent } = serializeArguments(value)
 
       // @ts-ignore
       return CredentialProveStruct({ entry_idx, referent, is_predictable, reveal })
@@ -377,9 +376,17 @@ export class NodeJSIndyCredx implements IndyCredx {
       data: Object.values(options.selfAttest),
     })
 
-    const schemas = options.schemas.map((value) => value.handle)
+    const schemas = ObjectHandleListStruct({
+      count: options.schemas.length,
+      // @ts-ignore
+      data: options.schemas.map((item) => item.handle),
+    })
 
-    const credentialDefinitions = options.credentialDefinitions.map((value) => value.handle)
+    const credentialDefinitions = ObjectHandleListStruct({
+      count: options.credentialDefinitions.length,
+      // @ts-ignore
+      data: options.credentialDefinitions.map((item) => item.handle),
+    })
 
     const ret = allocatePointer()
 

@@ -72,7 +72,7 @@ const serialize = (arg: Argument): SerializedArgument => {
     case 'object':
       if (arg instanceof ObjectHandle) {
         return arg.handle
-      } else if (Array.isArray(arg)) {
+      } else if (Array.isArray(arg) && arg.every((it) => typeof it === 'string')) {
         // @ts-ignore
         return StringListStruct({ count: arg.length, data: arg })
       }
