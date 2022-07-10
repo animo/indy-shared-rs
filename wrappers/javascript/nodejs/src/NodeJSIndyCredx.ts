@@ -22,7 +22,6 @@ import {
   CredentialProveStruct,
   CredentialEntryListStruct,
   CredentialProveListStruct,
-  ObjectHandleListStruct,
   RevocationEntryListStruct,
   RevocationEntryStruct,
   allocateInt8Buffer,
@@ -400,22 +399,25 @@ export class NodeJSIndyCredx implements IndyCredx {
     schemas: ObjectHandle[]
     credentialDefinitions: ObjectHandle[]
     revocationRegistryDefinitions: ObjectHandle[]
-    revocationRegistries: RevocationEntry[]
+    revocationEntries: RevocationEntry[]
   }): boolean {
     const { presentation, presentationRequest, schemas, credentialDefinitions, revocationRegistryDefinitions } =
       serializeArguments(options)
 
-    const revocationRegistries = RevocationEntryListStruct({
-      count: options.revocationRegistries.length,
-      // @ts-ignore
-      data: options.revocationRegistries.map((item) =>
-        RevocationEntryStruct({
-          def_entry_idx: item.revocationRegistryDefinitionEntryIndex,
-          entry: item.entry.handle,
-          timestamp: item.timestamp,
-        })
-      ),
-    })
+    const revocationRegistries =
+      options.revocationEntries.length > 0
+        ? RevocationEntryListStruct({
+            count: options.revocationEntries.length,
+            // @ts-ignore
+            data: options.revocationEntries.map((item) =>
+              RevocationEntryStruct({
+                def_entry_idx: item.revocationRegistryDefinitionEntryIndex,
+                entry: item.entry.handle,
+                timestamp: item.timestamp,
+              })
+            ),
+          })
+        : undefined
 
     const ret = allocateInt8Buffer()
 
@@ -487,7 +489,8 @@ export class NodeJSIndyCredx implements IndyCredx {
     revoked: number[]
     tailsDirectoryPath: string
   }): [ObjectHandle, ObjectHandle] {
-    const { revocationRegistryDefinition, revocationRegistry, tailsDirectoryPath, issued, revoked } = serializeArguments(options)
+    const { revocationRegistryDefinition, revocationRegistry, tailsDirectoryPath, issued, revoked } =
+      serializeArguments(options)
 
     const ret1 = allocatePointer()
     const ret2 = allocatePointer()

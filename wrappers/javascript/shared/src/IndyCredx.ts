@@ -113,7 +113,7 @@ export interface IndyCredx {
     schemas: ObjectHandle[]
     credentialDefinitions: ObjectHandle[]
     revocationRegistryDefinitions: ObjectHandle[]
-    revocationRegistries: RevocationEntry[]
+    revocationEntries: RevocationEntry[]
   }): boolean
 
   createRevocationRegistry(options: {
