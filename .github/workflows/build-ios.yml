@@ -1,0 +1,106 @@
+name: build-ios
+
+on:
+  push:
+  workflow_dispatch:
+
+env:
+  # Required for the aarch64 simulator
+  OPENSSL_DIR: /Users/runner/work/indy-shared-rs/indy-shared-rs/openssl
+  PACKAGE: indy-credx
+  LIB_NAME: indy_credx
+  HEADER_FILE: include/libindy_credx.h
+  # Required x86 simulator and aarch64 build
+  FEATURES: vendored
+
+jobs:
+  build_ios_sim:
+    name: build ios xcframework
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        architecture: [aarch64-apple-ios-sim]
+    steps:
+      - uses: actions/checkout@v2
+        # This should be a prebuilt docker image
+      - run: |
+          git clone https://github.com/openssl/openssl
+          cd openssl
+          git checkout OpenSSL_1_1_1-stable
+          ./Configure iossimulator-xcrun
+          make -j4
+          # Is it possible for openssl to be configured so that we can build into `./lib`?
+          # `--libdir` does not do the trick
+          # `--prefixdir` seems to not be valid when we try to supply it anything other than `/usr/local/lib`, etc
+          mkdir lib
+          mv libcrypto* lib
+          mv libssl* lib
+          cd ..
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: ${{ matrix.architecture }}
+          override: true
+      - uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --target ${{matrix.architecture}} --package ${{ env.PACKAGE }} --release
+      - name: Save static library
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.architecture}}
+          path: target/${{ matrix.architecture }}/release/lib${{ env.LIB_NAME }}.a
+
+  build_ios:
+    name: build ios xcframework
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        architecture: [aarch64-apple-ios, x86_64-apple-ios]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: ${{ matrix.architecture }}
+          override: true
+      - uses: actions-rs/cargo@v1
+        with:
+          use-cross: true
+          command: build
+          args: --target ${{matrix.architecture}} --package ${{ env.PACKAGE }} --features ${{ env.FEATURES }} --release
+      - name: Save static library
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.architecture}}
+          path: target/${{ matrix.architecture }}/release/lib${{ env.LIB_NAME }}.a
+
+  create_ios_xcframework:
+    name: Create ios xcframework
+    runs-on: macos-latest
+    needs: [build_ios, build_ios_sim]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Fetch static libraries
+        uses: actions/download-artifact@v3
+      - run: >
+          lipo -create aarch64-apple-ios-sim/lib${{ env.LIB_NAME }}.a \
+                       x86_64-apple-ios/lib${{ env.LIB_NAME }}.a \
+               -output lib${{ env.LIB_NAME }}.a
+      - run: >
+          xcodebuild -create-xcframework \
+            -library aarch64-apple-ios/lib${{ env.LIB_NAME }}.a -headers ${{ env.HEADER_FILE }} \
+            -library lib${{ env.LIB_NAME }}.a                   -headers ${{ env.HEADER_FILE }} \
+            -output ${{ env.LIB_NAME }}.xcframework
+      - name: Save xcframework
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.LIB_NAME }}.xcframework
+          path: ${{ env.LIB_NAME }}.xcframework
+      - uses: geekyeggo/delete-artifact@v1
+        with:
+          name: |
+            aarch64-apple-ios
+            aarch64-apple-ios-sim
+            x86_64-apple-ios
+          failOnError: false
