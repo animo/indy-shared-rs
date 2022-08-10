@@ -9,5 +9,5 @@ cargo install cbindgen
 From the `indy-credx` directory, generate the header file:
 
 ```sh
-cbindgen --config include/cbindgen.toml --crate indy-credx --output include/indy_credx.h
+cbindgen --config include/cbindgen.toml --output include/libindy_credx.h
 ```

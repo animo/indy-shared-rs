@@ -1,15 +1,14 @@
 {
   "extends": "./tsconfig.build.json",
-
   "compilerOptions": {
     "baseUrl": ".",
-    "types": ["node"],
     "paths": {
       "indy-credx-shared": ["shared/src"],
       "indy-credx-react-native": ["react-native/src"],
       "indy-credx-nodejs": ["nodejs/src"]
-    }
+    },
+    "types": ["node"]
   },
   "include": [".eslintrc.js"],
-  "exclude": ["node_modules", "build"]
+  "exclude": ["node_modules", "**/build/**", "build"]
 }

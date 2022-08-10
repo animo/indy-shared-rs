@@ -58,4 +58,4 @@ android/keystores/debug.keystore
 react-native/ios/Frameworks/*
 react-native/android/libs
 
-example
+ReactNativeExample

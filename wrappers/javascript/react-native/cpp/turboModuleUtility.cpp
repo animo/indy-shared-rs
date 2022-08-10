@@ -137,39 +137,6 @@ uint32_t jsiToValue(jsi::Runtime &rt, jsi::Object &options, const char *name,
 };
 
 template <>
-KeyEntryListHandle jsiToValue(jsi::Runtime &rt, jsi::Object &options,
-                              const char *name, bool optional) {
-  std::string handle = jsiToValue<std::string>(rt, options, name, optional);
-  FfiKeyEntryList *ffiKeyEntryListPtr =
-      reinterpret_cast<FfiKeyEntryList *>(std::stol(handle));
-  KeyEntryListHandle keyEntryListHandle =
-      KeyEntryListHandle{._0 = ffiKeyEntryListPtr};
-
-  return keyEntryListHandle;
-};
-
-template <>
-EntryListHandle jsiToValue(jsi::Runtime &rt, jsi::Object &options,
-                           const char *name, bool optional) {
-  std::string handle = jsiToValue<std::string>(rt, options, name, optional);
-  FfiEntryList *ffiEntryListPtr =
-      reinterpret_cast<FfiEntryList *>(std::stol(handle));
-  EntryListHandle entryListHandle = EntryListHandle{._0 = ffiEntryListPtr};
-
-  return entryListHandle;
-};
-
-template <>
-LocalKeyHandle jsiToValue(jsi::Runtime &rt, jsi::Object &options,
-                          const char *name, bool optional) {
-  std::string handle = jsiToValue<std::string>(rt, options, name, optional);
-  LocalKey *localKeyPtr = reinterpret_cast<LocalKey *>(std::stol(handle));
-  LocalKeyHandle localKeyHandle = LocalKeyHandle{._0 = localKeyPtr};
-
-  return localKeyHandle;
-};
-
-template <>
 std::vector<int32_t>
 jsiToValue<std::vector<int32_t>>(jsi::Runtime &rt, jsi::Object &options,
                                  const char *name, bool optional) {
@@ -194,45 +161,6 @@ jsiToValue<std::vector<int32_t>>(jsi::Runtime &rt, jsi::Object &options,
     return {};
 
   throw jsi::JSError(rt, errorPrefix + name + errorInfix + "Array<number>");
-}
-
-template <>
-ByteBuffer jsiToValue<ByteBuffer>(jsi::Runtime &rt, jsi::Object &options,
-                                  const char *name, bool optional) {
-  jsi::Value value = options.getProperty(rt, name);
-
-  if (value.isObject() && value.asObject(rt).isArrayBuffer(rt)) {
-    jsi::ArrayBuffer arrayBuffer = value.getObject(rt).getArrayBuffer(rt);
-    return ByteBuffer{int(arrayBuffer.size(rt)), arrayBuffer.data(rt)};
-  }
-
-  if (optional)
-    return ByteBuffer{0, 0};
-
-  throw jsi::JSError(rt, errorPrefix + name + errorInfix + "Uint8Array");
-}
-
-jsi::ArrayBuffer byteBufferToArrayBuffer(jsi::Runtime &rt, ByteBuffer bb) {
-  jsi::ArrayBuffer arrayBuffer = rt.global()
-                                     .getPropertyAsFunction(rt, "ArrayBuffer")
-                                     .callAsConstructor(rt, int(bb.len))
-                                     .getObject(rt)
-                                     .getArrayBuffer(rt);
-
-  memcpy(arrayBuffer.data(rt), bb.data, bb.len);
-  return arrayBuffer;
-}
-
-jsi::ArrayBuffer secretBufferToArrayBuffer(jsi::Runtime &rt, SecretBuffer sb) {
-  jsi::ArrayBuffer arrayBuffer = rt.global()
-                                     .getPropertyAsFunction(rt, "ArrayBuffer")
-                                     .callAsConstructor(rt, int(sb.len))
-                                     .getObject(rt)
-                                     .getArrayBuffer(rt);
-
-  // TODO: signature here is weird. sb.data cannot go into ab.data()
-  memcpy(arrayBuffer.data(rt), sb.data, sb.len);
-  return arrayBuffer;
 }
 
 } // namespace turboModuleUtility

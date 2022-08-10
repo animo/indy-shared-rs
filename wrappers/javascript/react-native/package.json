@@ -49,8 +49,8 @@
     "indy-credx-shared": "*"
   },
   "devDependencies": {
-    "@types/react": "^16.9.19",
-    "@types/react-native": "^0.67.0",
+    "@types/react": "16.9.19",
+    "@types/react-native": "0.67.0",
     "prettier": "2.6.2",
     "react": "17.0.2",
     "react-native": "0.67.2",

@@ -36,15 +36,4 @@ T jsiToValue(jsi::Runtime &rt, jsi::Object &options, const char *name,
 // Handles an error from within the module and sends it back to the js side
 void handleError(jsi::Runtime &rt, ErrorCode code);
 
-// Callback function that makes the host function async
-void callback(CallbackId result, ErrorCode code);
-
-// Callback function that makes the host function async with response from rust
-// side
-template <typename T>
-void callbackWithResponse(CallbackId result, ErrorCode code, T response);
-
-jsi::ArrayBuffer byteBufferToArrayBuffer(jsi::Runtime &rt, ByteBuffer bb);
-jsi::ArrayBuffer secretBufferToArrayBuffer(jsi::Runtime &rt, SecretBuffer sb);
-
 } // namespace turboModuleUtility

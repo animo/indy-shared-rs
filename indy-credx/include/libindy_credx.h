@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+typedef size_t ObjectHandle;
+
 
 enum ErrorCode
 #ifdef __cplusplus

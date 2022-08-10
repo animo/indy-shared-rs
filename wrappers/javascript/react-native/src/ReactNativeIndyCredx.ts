@@ -7,9 +7,11 @@ import type {
   RevocationEntry,
 } from 'indy-credx-shared'
 
+import { indyCredxReactNative } from './library'
+
 export class ReactNativeIndyCredx implements IndyCredx {
   public version(): string {
-    throw new Error('Method not implemented.')
+    return indyCredxReactNative.version({})
   }
 
   public getCurrentError(): string {
@@ -29,6 +31,7 @@ export class ReactNativeIndyCredx implements IndyCredx {
   }): ObjectHandle {
     throw new Error('Method not implemented.')
   }
+
   public createCredentialDefinition(options: {
     originDid: string
     schema: ObjectHandle

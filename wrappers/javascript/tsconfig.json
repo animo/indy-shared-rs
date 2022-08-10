@@ -6,8 +6,7 @@
       "indy-credx-shared": ["shared/src"],
       "indy-credx-react-native": ["react-native/src"],
       "indy-credx-nodejs": ["nodejs/src"]
-    },
-    "types": ["node"]
+    }
   },
   "exclude": ["node_modules", "**/build/**", "build"]
 }
