@@ -60,31 +60,31 @@ export class NodeJSIndyCredx implements IndyCredx {
     return new ObjectHandle(ret.deref() as number)
   }
 
-  public schemaGetAttribute(options: { object: ObjectHandle; name: string }) {
-    const { object, name } = serializeArguments(options)
+  public schemaGetAttribute(options: { objectHandle: ObjectHandle; name: string }) {
+    const { objectHandle, name } = serializeArguments(options)
 
     const ret = allocateStringBuffer()
-    nativeIndyCredx.credx_schema_get_attribute(object, name, ret)
+    nativeIndyCredx.credx_schema_get_attribute(objectHandle, name, ret)
     handleError()
 
     return ret.deref() as string
   }
 
-  public revocationRegistryDefinitionGetAttribute(options: { object: ObjectHandle; name: string }) {
-    const { object, name } = serializeArguments(options)
+  public revocationRegistryDefinitionGetAttribute(options: { objectHandle: ObjectHandle; name: string }) {
+    const { objectHandle, name } = serializeArguments(options)
 
     const ret = allocateStringBuffer()
-    nativeIndyCredx.credx_revocation_registry_definition_get_attribute(object, name, ret)
+    nativeIndyCredx.credx_revocation_registry_definition_get_attribute(objectHandle, name, ret)
     handleError()
 
     return ret.deref() as string
   }
 
-  public credentialGetAttribute(options: { object: ObjectHandle; name: string }) {
-    const { object, name } = serializeArguments(options)
+  public credentialGetAttribute(options: { objectHandle: ObjectHandle; name: string }) {
+    const { objectHandle, name } = serializeArguments(options)
 
     const ret = allocateStringBuffer()
-    nativeIndyCredx.credx_credential_get_attribute(object, name, ret)
+    nativeIndyCredx.credx_credential_get_attribute(objectHandle, name, ret)
     handleError()
 
     return ret.deref() as string
@@ -122,11 +122,11 @@ export class NodeJSIndyCredx implements IndyCredx {
     ]
   }
 
-  public credentialDefinitionGetAttribute(options: { object: ObjectHandle; name: string }): string {
-    const { object, name } = serializeArguments(options)
+  public credentialDefinitionGetAttribute(options: { objectHandle: ObjectHandle; name: string }): string {
+    const { objectHandle, name } = serializeArguments(options)
 
     const ret = allocateStringBuffer()
-    nativeIndyCredx.credx_credential_definition_get_attribute(object, name, ret)
+    nativeIndyCredx.credx_credential_definition_get_attribute(objectHandle, name, ret)
     handleError()
 
     return ret.deref() as string
@@ -651,11 +651,11 @@ export class NodeJSIndyCredx implements IndyCredx {
     return this.objectFromJson(nativeIndyCredx.credx_key_correctness_proof_from_json, options)
   }
 
-  public getJson(options: { object: ObjectHandle }) {
+  public getJson(options: { objectHandle: ObjectHandle }) {
     const ret = allocateByteBuffer()
 
-    const { object } = serializeArguments(options)
-    nativeIndyCredx.credx_object_get_json(object, ret)
+    const { objectHandle } = serializeArguments(options)
+    nativeIndyCredx.credx_object_get_json(objectHandle, ret)
     handleError()
 
     const output = new Uint8Array(byteBufferToBuffer(ret.deref()))
@@ -663,19 +663,19 @@ export class NodeJSIndyCredx implements IndyCredx {
     return new TextDecoder().decode(output)
   }
 
-  public getTypeName(options: { object: ObjectHandle }) {
-    const { object } = serializeArguments(options)
+  public getTypeName(options: { objectHandle: ObjectHandle }) {
+    const { objectHandle } = serializeArguments(options)
 
     const ret = allocateStringBuffer()
 
-    nativeIndyCredx.credx_object_get_type_name(object, ret)
+    nativeIndyCredx.credx_object_get_type_name(objectHandle, ret)
     handleError()
 
     return ret.deref() as string
   }
 
-  public objectFree(options: { object: ObjectHandle }) {
-    nativeIndyCredx.credx_object_free(options.object.handle)
+  public objectFree(options: { objectHandle: ObjectHandle }) {
+    nativeIndyCredx.credx_object_free(options.objectHandle.handle)
     handleError()
   }
 }

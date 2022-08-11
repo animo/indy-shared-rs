@@ -32,13 +32,13 @@ describe('bindings', () => {
     })
 
     const schemaId = indyCredx.schemaGetAttribute({
-      object: schemaObj,
+      objectHandle: schemaObj,
       name: 'id',
     })
 
     expect(schemaId).toEqual('55GkHamhTU1ZbTbV2ab9DE:2:schema-1:1')
 
-    const json = indyCredx.getJson({ object: schemaObj })
+    const json = indyCredx.getJson({ objectHandle: schemaObj })
     expect(JSON.parse(json)).toEqual({
       id: '55GkHamhTU1ZbTbV2ab9DE:2:schema-1:1',
       name: 'schema-1',
@@ -66,7 +66,7 @@ describe('bindings', () => {
       tag: 'TAG',
     })
 
-    const credDefJson = indyCredx.getJson({ object: credDefObj })
+    const credDefJson = indyCredx.getJson({ objectHandle: credDefObj })
     expect(JSON.parse(credDefJson)).toEqual(
       expect.objectContaining({
         id: '55GkHamhTU1ZbTbV2ab9DE:3:CL:1:TAG',
@@ -77,10 +77,10 @@ describe('bindings', () => {
       })
     )
 
-    const credDefPvtJson = indyCredx.getJson({ object: credDefPvt })
+    const credDefPvtJson = indyCredx.getJson({ objectHandle: credDefPvt })
     expect(JSON.parse(credDefPvtJson)).toHaveProperty('value')
 
-    const keyProofJson = indyCredx.getJson({ object: keyProof })
+    const keyProofJson = indyCredx.getJson({ objectHandle: keyProof })
     expect(JSON.parse(keyProofJson)).toHaveProperty('c')
     expect(JSON.parse(keyProofJson)).toHaveProperty('xr_cap')
   })
@@ -118,12 +118,12 @@ describe('bindings', () => {
       })
 
       const maximumCredentialNumber = indyCredx.revocationRegistryDefinitionGetAttribute({
-        object: revRegDef,
+        objectHandle: revRegDef,
         name: 'max_cred_num',
       })
 
       expect(maximumCredentialNumber).toEqual('100')
-      const json = indyCredx.getJson({ object: revRegDef })
+      const json = indyCredx.getJson({ objectHandle: revRegDef })
       expect(JSON.parse(json)).toEqual(
         expect.objectContaining({
           credDefId: '55GkHamhTU1ZbTbV2ab9DE:3:CL:1:TAG',
@@ -143,7 +143,7 @@ describe('bindings', () => {
 
   test('create master secret', () => {
     const masterSecret = indyCredx.createMasterSecret()
-    const json = indyCredx.getJson({ object: masterSecret })
+    const json = indyCredx.getJson({ objectHandle: masterSecret })
     expect(JSON.parse(json)).toHaveProperty('value')
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     expect(JSON.parse(json).value).toHaveProperty('ms')
@@ -172,7 +172,7 @@ describe('bindings', () => {
       keyProof,
     })
 
-    const json = indyCredx.getJson({ object: credOfferObj })
+    const json = indyCredx.getJson({ objectHandle: credOfferObj })
     expect(JSON.parse(json)).toEqual(
       expect.objectContaining({
         cred_def_id: '55GkHamhTU1ZbTbV2ab9DE:3:CL:1:TAG',
@@ -217,7 +217,7 @@ describe('bindings', () => {
       credentialOffer: credOfferObj,
     })
 
-    const credReqJson = indyCredx.getJson({ object: credReq })
+    const credReqJson = indyCredx.getJson({ objectHandle: credReq })
     expect(JSON.parse(credReqJson)).toEqual(
       expect.objectContaining({
         prover_did: '55GkHamhTU1ZbTbV2ab9DE',
@@ -226,7 +226,7 @@ describe('bindings', () => {
     expect(JSON.parse(credReqJson)).toHaveProperty('blinded_ms')
     expect(JSON.parse(credReqJson)).toHaveProperty('nonce')
 
-    const credReqMetadataJson = indyCredx.getJson({ object: credReqMetadata })
+    const credReqMetadataJson = indyCredx.getJson({ objectHandle: credReqMetadata })
     expect(JSON.parse(credReqMetadataJson)).toEqual(
       expect.objectContaining({
         master_secret_name: masterSecretId,
@@ -279,7 +279,7 @@ describe('bindings', () => {
     })
 
     const tailsPath = indyCredx.revocationRegistryDefinitionGetAttribute({
-      object: revRegDef,
+      objectHandle: revRegDef,
       name: 'tails_location',
     })
 
@@ -307,7 +307,7 @@ describe('bindings', () => {
       revocationRegistryDefinition: revRegDef,
     })
 
-    const credJson = indyCredx.getJson({ object: cred })
+    const credJson = indyCredx.getJson({ objectHandle: cred })
     expect(JSON.parse(credJson)).toEqual(
       expect.objectContaining({
         cred_def_id: '55GkHamhTU1ZbTbV2ab9DE:3:CL:1:TAG',
@@ -316,7 +316,7 @@ describe('bindings', () => {
       })
     )
 
-    const credReceivedJson = indyCredx.getJson({ object: credReceived })
+    const credReceivedJson = indyCredx.getJson({ objectHandle: credReceived })
     expect(JSON.parse(credReceivedJson)).toEqual(
       expect.objectContaining({
         cred_def_id: '55GkHamhTU1ZbTbV2ab9DE:3:CL:1:TAG',
@@ -352,7 +352,7 @@ describe('bindings', () => {
       }),
     })
 
-    expect(indyCredx.getTypeName({ object: presRequestObj })).toEqual('PresentationRequest')
+    expect(indyCredx.getTypeName({ objectHandle: presRequestObj })).toEqual('PresentationRequest')
 
     const schemaObj = indyCredx.createSchema({
       name: 'schema-1',
@@ -396,7 +396,7 @@ describe('bindings', () => {
     })
 
     const tailsPath = indyCredx.revocationRegistryDefinitionGetAttribute({
-      object: revRegDef,
+      objectHandle: revRegDef,
       name: 'tails_location',
     })
 
@@ -417,7 +417,7 @@ describe('bindings', () => {
     })
 
     const revRegIndex = indyCredx.credentialGetAttribute({
-      object: cred,
+      objectHandle: cred,
       name: 'rev_reg_index',
     })
 

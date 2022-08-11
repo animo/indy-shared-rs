@@ -66,19 +66,19 @@ export class Credential extends IndyObject {
   }
 
   public getSchemaId() {
-    return indyCredx.credentialGetAttribute({ object: this.handle, name: 'schema_id' })
+    return indyCredx.credentialGetAttribute({ objectHandle: this.handle, name: 'schema_id' })
   }
 
   public getCredentialDefinitionId() {
-    return indyCredx.credentialGetAttribute({ object: this.handle, name: 'cred_def_id' })
+    return indyCredx.credentialGetAttribute({ objectHandle: this.handle, name: 'cred_def_id' })
   }
 
   public getRevocationRegistryId() {
-    return indyCredx.credentialGetAttribute({ object: this.handle, name: 'rev_reg_id' })
+    return indyCredx.credentialGetAttribute({ objectHandle: this.handle, name: 'rev_reg_id' })
   }
 
   public getRevocationRegistryIndex() {
-    const index = indyCredx.credentialGetAttribute({ object: this.handle, name: 'rev_reg_index' })
+    const index = indyCredx.credentialGetAttribute({ objectHandle: this.handle, name: 'rev_reg_index' })
     return index ? Number(index) : undefined
   }
 }
