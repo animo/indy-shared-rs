@@ -36,10 +36,10 @@ export class CredentialDefinition extends IndyObject {
   }
 
   public getId() {
-    return indyCredx.credentialDefinitionGetAttribute({ object: this.handle, name: 'id' })
+    return indyCredx.credentialDefinitionGetAttribute({ objectHandle: this.handle, name: 'id' })
   }
 
   public getSchemaId() {
-    return indyCredx.credentialDefinitionGetAttribute({ object: this.handle, name: 'schema_id' })
+    return indyCredx.credentialDefinitionGetAttribute({ objectHandle: this.handle, name: 'schema_id' })
   }
 }

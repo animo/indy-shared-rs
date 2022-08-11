@@ -19,6 +19,6 @@ export class Schema extends IndyObject {
   }
 
   public getId() {
-    return indyCredx.schemaGetAttribute({ object: this.handle, name: 'id' })
+    return indyCredx.schemaGetAttribute({ objectHandle: this.handle, name: 'id' })
   }
 }

@@ -148,13 +148,13 @@ export interface IndyCredx {
     previousRevocationState?: ObjectHandle
   }): ObjectHandle
 
-  credentialGetAttribute(options: { object: ObjectHandle; name: string }): string
+  credentialGetAttribute(options: { objectHandle: ObjectHandle; name: string }): string
 
-  credentialDefinitionGetAttribute(options: { object: ObjectHandle; name: string }): string
+  credentialDefinitionGetAttribute(options: { objectHandle: ObjectHandle; name: string }): string
 
-  schemaGetAttribute(options: { object: ObjectHandle; name: string }): string
+  schemaGetAttribute(options: { objectHandle: ObjectHandle; name: string }): string
 
-  revocationRegistryDefinitionGetAttribute(options: { object: ObjectHandle; name: string }): string
+  revocationRegistryDefinitionGetAttribute(options: { objectHandle: ObjectHandle; name: string }): string
 
   presentationRequestFromJson(options: { json: string }): ObjectHandle
 
@@ -188,9 +188,9 @@ export interface IndyCredx {
 
   keyCorrectnessProofFromJson(options: { json: string }): ObjectHandle
 
-  getJson(options: { object: ObjectHandle }): string
+  getJson(options: { objectHandle: ObjectHandle }): string
 
-  getTypeName(options: { object: ObjectHandle }): string
+  getTypeName(options: { objectHandle: ObjectHandle }): string
 
-  objectFree(options: { object: ObjectHandle }): void
+  objectFree(options: { objectHandle: ObjectHandle }): void
 }

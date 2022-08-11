@@ -12,11 +12,11 @@ export class ObjectHandle {
   }
 
   public typeName() {
-    return indyCredx.getTypeName({ object: this })
+    return indyCredx.getTypeName({ objectHandle: this })
   }
 
   // TODO: do we need this?
   public clear() {
-    indyCredx.objectFree({ object: this })
+    indyCredx.objectFree({ objectHandle: this })
   }
 }

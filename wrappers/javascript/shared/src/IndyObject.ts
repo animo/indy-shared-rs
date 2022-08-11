@@ -24,7 +24,7 @@ export class IndyObject {
   }
 
   public toJson() {
-    return indyCredx.getJson({ object: this._handle })
+    return indyCredx.getJson({ objectHandle: this._handle })
   }
 
   // TODO: do we need this?

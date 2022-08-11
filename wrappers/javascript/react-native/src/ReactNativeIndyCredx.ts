@@ -1,10 +1,10 @@
 import type {
-  CredentialEntry,
-  CredentialProve,
-  CredentialRevocationConfig,
   IndyCredx,
+  NativeCredentialEntry,
+  NativeCredentialProve,
+  NativeCredentialRevocationConfig,
+  NativeRevocationEntry,
   ObjectHandle,
-  RevocationEntry,
 } from 'indy-credx-shared'
 
 import { indyCredxReactNative } from './library'
@@ -49,7 +49,7 @@ export class ReactNativeIndyCredx implements IndyCredx {
     credentialRequest: ObjectHandle
     attributeRawValues: Record<string, string>
     attributeEncodedValues?: Record<string, string> | undefined
-    revocationConfiguration?: CredentialRevocationConfig | undefined
+    revocationConfiguration?: NativeCredentialRevocationConfig | undefined
   }): [ObjectHandle, ObjectHandle, ObjectHandle] {
     throw new Error('Method not implemented.')
   }
@@ -101,8 +101,8 @@ export class ReactNativeIndyCredx implements IndyCredx {
 
   public createPresentation(options: {
     presentationRequest: ObjectHandle
-    credentials: CredentialEntry[]
-    credentialsProve: CredentialProve[]
+    credentials: NativeCredentialEntry[]
+    credentialsProve: NativeCredentialProve[]
     selfAttest: Record<string, string>
     masterSecret: ObjectHandle
     schemas: ObjectHandle[]
@@ -117,7 +117,7 @@ export class ReactNativeIndyCredx implements IndyCredx {
     schemas: ObjectHandle[]
     credentialDefinitions: ObjectHandle[]
     revocationRegistryDefinitions: ObjectHandle[]
-    revocationEntries: RevocationEntry[]
+    revocationEntries: NativeRevocationEntry[]
   }): boolean {
     throw new Error('Method not implemented.')
   }
@@ -166,27 +166,90 @@ export class ReactNativeIndyCredx implements IndyCredx {
     throw new Error('Method not implemented.')
   }
 
-  public schemaGetAttribute(options: { schema: ObjectHandle; name: string }): string {
+  public schemaGetAttribute(options: { objectHandle: ObjectHandle; name: string }): string {
     throw new Error('Method not implemented.')
   }
 
-  public revocationRegistryDefinitionGetAttribute(options: { object: ObjectHandle; name: string }): string {
+  public revocationRegistryDefinitionGetAttribute(options: { objectHandle: ObjectHandle; name: string }): string {
     throw new Error('Method not implemented.')
   }
 
-  public credentialGetAttribute(options: { object: ObjectHandle; name: string }): string {
+  public credentialGetAttribute(options: { objectHandle: ObjectHandle; name: string }): string {
     throw new Error('Method not implemented.')
   }
 
-  public getJson(options: { object: ObjectHandle }): string {
+  public getJson(options: { objectHandle: ObjectHandle }): string {
     throw new Error('Method not implemented.')
   }
 
-  public getTypeName(options: { object: ObjectHandle }): string {
+  public getTypeName(options: { objectHandle: ObjectHandle }): string {
     throw new Error('Method not implemented.')
   }
 
-  public objectFree(options: { object: ObjectHandle }): void {
+  public objectFree(options: { objectHandle: ObjectHandle }): void {
+    throw new Error('Method not implemented.')
+  }
+
+  public credentialDefinitionGetAttribute(options: { objectHandle: ObjectHandle; name: string }): string {
+    throw new Error('Method not implemented.')
+  }
+
+  public revocationRegistryDefinitionFromJson(options: { json: string }): ObjectHandle {
+    throw new Error('Method not implemented.')
+  }
+
+  public revocationRegistryFromJson(options: { json: string }): ObjectHandle {
+    throw new Error('Method not implemented.')
+  }
+
+  public presentationFromJson(options: { json: string }): ObjectHandle {
+    throw new Error('Method not implemented.')
+  }
+
+  public credentialOfferFromJson(options: { json: string }): ObjectHandle {
+    throw new Error('Method not implemented.')
+  }
+
+  public schemaFromJson(options: { json: string }): ObjectHandle {
+    throw new Error('Method not implemented.')
+  }
+
+  public masterSecretFromJson(options: { json: string }): ObjectHandle {
+    throw new Error('Method not implemented.')
+  }
+
+  public credentialRequestFromJson(options: { json: string }): ObjectHandle {
+    throw new Error('Method not implemented.')
+  }
+
+  public credentialRequestMetadataFromJson(options: { json: string }): ObjectHandle {
+    throw new Error('Method not implemented.')
+  }
+
+  public credentialFromJson(options: { json: string }): ObjectHandle {
+    throw new Error('Method not implemented.')
+  }
+
+  public revocationRegistryDefinitionPrivateFromJson(options: { json: string }): ObjectHandle {
+    throw new Error('Method not implemented.')
+  }
+
+  public revocationRegistryDeltaFromJson(options: { json: string }): ObjectHandle {
+    throw new Error('Method not implemented.')
+  }
+
+  public revocationStateFromJson(options: { json: string }): ObjectHandle {
+    throw new Error('Method not implemented.')
+  }
+  public credentialDefinitionFromJson(options: { json: string }): ObjectHandle {
+    throw new Error('Method not implemented.')
+  }
+
+  public credentialDefinitionPrivateFromJson(options: { json: string }): ObjectHandle {
+    throw new Error('Method not implemented.')
+  }
+
+  public keyCorrectnessProofFromJson(options: { json: string }): ObjectHandle {
     throw new Error('Method not implemented.')
   }
 }

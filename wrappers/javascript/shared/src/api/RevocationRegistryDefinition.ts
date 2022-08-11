@@ -42,18 +42,20 @@ export class RevocationRegistryDefinition extends IndyObject {
   }
 
   public getId() {
-    return indyCredx.revocationRegistryDefinitionGetAttribute({ object: this.handle, name: 'id' })
+    return indyCredx.revocationRegistryDefinitionGetAttribute({ objectHandle: this.handle, name: 'id' })
   }
 
   public getMaximumCredentialNumber() {
-    return Number(indyCredx.revocationRegistryDefinitionGetAttribute({ object: this.handle, name: 'max_cred_num' }))
+    return Number(
+      indyCredx.revocationRegistryDefinitionGetAttribute({ objectHandle: this.handle, name: 'max_cred_num' })
+    )
   }
 
   public getTailsHash() {
-    return indyCredx.revocationRegistryDefinitionGetAttribute({ object: this.handle, name: 'tails_hash' })
+    return indyCredx.revocationRegistryDefinitionGetAttribute({ objectHandle: this.handle, name: 'tails_hash' })
   }
 
   public getTailsLocation() {
-    return indyCredx.revocationRegistryDefinitionGetAttribute({ object: this.handle, name: 'tails_location' })
+    return indyCredx.revocationRegistryDefinitionGetAttribute({ objectHandle: this.handle, name: 'tails_location' })
   }
 }
