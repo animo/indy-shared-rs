@@ -7,11 +7,11 @@ on:
 env:
   # Required for the aarch64 simulator
   OPENSSL_DIR: /Users/runner/work/indy-shared-rs/indy-shared-rs/openssl
-  PACKAGE: indy-credx
-  LIB_NAME: indy_credx
-  HEADER_FILE: include/libindy_credx.h
   # Required x86 simulator and aarch64 build
   FEATURES: vendored
+  PACKAGE: indy-credx
+  LIB_NAME: indy_credx
+  HEADER_FILE: indy-credx/include/libindy_credx.h
 
 jobs:
   build_ios_sim:
