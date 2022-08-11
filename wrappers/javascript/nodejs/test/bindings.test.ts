@@ -32,7 +32,7 @@ describe('bindings', () => {
     })
 
     const schemaId = indyCredx.schemaGetAttribute({
-      schema: schemaObj,
+      object: schemaObj,
       name: 'id',
     })
 
