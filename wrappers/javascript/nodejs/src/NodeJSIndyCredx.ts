@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import type {
-  CredentialEntry,
-  CredentialProve,
+  NativeCredentialEntry,
+  NativeCredentialProve,
   IndyCredx,
-  RevocationEntry,
-  CredentialRevocationConfig,
+  NativeRevocationEntry,
+  NativeCredentialRevocationConfig,
 } from 'indy-credx-shared'
 
 import { ObjectHandle } from 'indy-credx-shared'
@@ -60,11 +60,11 @@ export class NodeJSIndyCredx implements IndyCredx {
     return new ObjectHandle(ret.deref() as number)
   }
 
-  public schemaGetAttribute(options: { schema: ObjectHandle; name: string }) {
-    const { schema, name } = serializeArguments(options)
+  public schemaGetAttribute(options: { object: ObjectHandle; name: string }) {
+    const { object, name } = serializeArguments(options)
 
     const ret = allocateStringBuffer()
-    nativeIndyCredx.credx_schema_get_attribute(schema, name, ret)
+    nativeIndyCredx.credx_schema_get_attribute(object, name, ret)
     handleError()
 
     return ret.deref() as string
@@ -122,6 +122,16 @@ export class NodeJSIndyCredx implements IndyCredx {
     ]
   }
 
+  public credentialDefinitionGetAttribute(options: { object: ObjectHandle; name: string }): string {
+    const { object, name } = serializeArguments(options)
+
+    const ret = allocateStringBuffer()
+    nativeIndyCredx.credx_credential_definition_get_attribute(object, name, ret)
+    handleError()
+
+    return ret.deref() as string
+  }
+
   public createCredential(options: {
     credentialDefinition: ObjectHandle
     credentialDefinitionPrivate: ObjectHandle
@@ -129,7 +139,7 @@ export class NodeJSIndyCredx implements IndyCredx {
     credentialRequest: ObjectHandle
     attributeRawValues: Record<string, string>
     attributeEncodedValues?: Record<string, string> | undefined
-    revocationConfiguration?: CredentialRevocationConfig | undefined
+    revocationConfiguration?: NativeCredentialRevocationConfig | undefined
   }): [ObjectHandle, ObjectHandle, ObjectHandle] {
     const { credentialDefinition, credentialDefinitionPrivate, credentialOffer, credentialRequest } =
       serializeArguments(options)
@@ -331,8 +341,8 @@ export class NodeJSIndyCredx implements IndyCredx {
 
   public createPresentation(options: {
     presentationRequest: ObjectHandle
-    credentials: CredentialEntry[]
-    credentialsProve: CredentialProve[]
+    credentials: NativeCredentialEntry[]
+    credentialsProve: NativeCredentialProve[]
     selfAttest: Record<string, string>
     masterSecret: ObjectHandle
     schemas: ObjectHandle[]
@@ -400,7 +410,7 @@ export class NodeJSIndyCredx implements IndyCredx {
     schemas: ObjectHandle[]
     credentialDefinitions: ObjectHandle[]
     revocationRegistryDefinitions: ObjectHandle[]
-    revocationEntries: RevocationEntry[]
+    revocationEntries: NativeRevocationEntry[]
   }): boolean {
     const { presentation, presentationRequest, schemas, credentialDefinitions, revocationRegistryDefinitions } =
       serializeArguments(options)
@@ -565,16 +575,80 @@ export class NodeJSIndyCredx implements IndyCredx {
     return ret.deref() as string
   }
 
-  public presentationRequestFromJson(options: { json: string }) {
+  private objectFromJson(method: (byteBuffer: Buffer, ret: Buffer) => unknown, options: { json: string }) {
     const ret = allocatePointer()
 
     const byteBuffer = ByteBuffer.fromUint8Array(new TextEncoder().encode(options.json))
     handleError()
 
     // @ts-ignore
-    nativeIndyCredx.credx_presentation_request_from_json(byteBuffer, ret)
+    method(byteBuffer, ret)
 
     return new ObjectHandle(ret.deref() as number)
+  }
+
+  public presentationRequestFromJson(options: { json: string }) {
+    return this.objectFromJson(nativeIndyCredx.credx_presentation_request_from_json, options)
+  }
+
+  public masterSecretFromJson(options: { json: string }): ObjectHandle {
+    return this.objectFromJson(nativeIndyCredx.credx_master_secret_from_json, options)
+  }
+
+  public credentialRequestFromJson(options: { json: string }): ObjectHandle {
+    return this.objectFromJson(nativeIndyCredx.credx_credential_request_from_json, options)
+  }
+
+  public credentialRequestMetadataFromJson(options: { json: string }): ObjectHandle {
+    return this.objectFromJson(nativeIndyCredx.credx_credential_request_metadata_from_json, options)
+  }
+
+  public revocationRegistryDefinitionFromJson(options: { json: string }): ObjectHandle {
+    return this.objectFromJson(nativeIndyCredx.credx_revocation_registry_definition_from_json, options)
+  }
+
+  public revocationRegistryFromJson(options: { json: string }): ObjectHandle {
+    return this.objectFromJson(nativeIndyCredx.credx_revocation_registry_from_json, options)
+  }
+
+  public revocationStateFromJson(options: { json: string }): ObjectHandle {
+    return this.objectFromJson(nativeIndyCredx.credx_revocation_state_from_json, options)
+  }
+
+  public presentationFromJson(options: { json: string }): ObjectHandle {
+    return this.objectFromJson(nativeIndyCredx.credx_presentation_from_json, options)
+  }
+
+  public credentialOfferFromJson(options: { json: string }): ObjectHandle {
+    return this.objectFromJson(nativeIndyCredx.credx_credential_offer_from_json, options)
+  }
+
+  public schemaFromJson(options: { json: string }): ObjectHandle {
+    return this.objectFromJson(nativeIndyCredx.credx_schema_from_json, options)
+  }
+
+  public credentialFromJson(options: { json: string }): ObjectHandle {
+    return this.objectFromJson(nativeIndyCredx.credx_credential_from_json, options)
+  }
+
+  public revocationRegistryDefinitionPrivateFromJson(options: { json: string }): ObjectHandle {
+    return this.objectFromJson(nativeIndyCredx.credx_revocation_registry_definition_private_from_json, options)
+  }
+
+  public revocationRegistryDeltaFromJson(options: { json: string }): ObjectHandle {
+    return this.objectFromJson(nativeIndyCredx.credx_revocation_registry_delta_from_json, options)
+  }
+
+  public credentialDefinitionFromJson(options: { json: string }): ObjectHandle {
+    return this.objectFromJson(nativeIndyCredx.credx_credential_definition_from_json, options)
+  }
+
+  public credentialDefinitionPrivateFromJson(options: { json: string }): ObjectHandle {
+    return this.objectFromJson(nativeIndyCredx.credx_credential_definition_private_from_json, options)
+  }
+
+  public keyCorrectnessProofFromJson(options: { json: string }): ObjectHandle {
+    return this.objectFromJson(nativeIndyCredx.credx_key_correctness_proof_from_json, options)
   }
 
   public getJson(options: { object: ObjectHandle }) {

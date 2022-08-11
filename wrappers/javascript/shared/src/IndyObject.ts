@@ -3,15 +3,19 @@ import { IndyCredxError } from './error'
 import { indyCredx } from './register'
 
 export class IndyObject {
-  private handle: ObjectHandle
+  protected _handle: ObjectHandle
 
   public constructor(handle: number) {
-    this.handle = new ObjectHandle(handle)
+    this._handle = new ObjectHandle(handle)
+  }
+
+  public get handle(): ObjectHandle {
+    return this._handle
   }
 
   // TODO: do we need this?
   public copy() {
-    return new IndyObject(this.handle.handle)
+    return new IndyObject(this._handle.handle)
   }
 
   // TODO: do we need this?
@@ -20,7 +24,7 @@ export class IndyObject {
   }
 
   public toJson() {
-    return indyCredx.getJson({ object: this.handle })
+    return indyCredx.getJson({ object: this._handle })
   }
 
   // TODO: do we need this?

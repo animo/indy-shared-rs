@@ -3,26 +3,26 @@
 
 import type { ObjectHandle } from './ObjectHandle'
 
-export type CredentialEntry = {
+export type NativeCredentialEntry = {
   credential: ObjectHandle
   timestamp: number
   revocationState: ObjectHandle
 }
 
-export type CredentialProve = {
+export type NativeCredentialProve = {
   entryIndex: number
   referent: string
   isPredicate: boolean
   reveal: boolean
 }
 
-export type RevocationEntry = {
+export type NativeRevocationEntry = {
   revocationRegistryDefinitionEntryIndex: number
   entry: ObjectHandle
   timestamp: number
 }
 
-export type CredentialRevocationConfig = {
+export type NativeCredentialRevocationConfig = {
   registryDefinition: ObjectHandle
   registryDefinitionPrivate: ObjectHandle
   registry: ObjectHandle
@@ -61,7 +61,7 @@ export interface IndyCredx {
     credentialRequest: ObjectHandle
     attributeRawValues: Record<string, string>
     attributeEncodedValues?: Record<string, string>
-    revocationConfiguration?: CredentialRevocationConfig
+    revocationConfiguration?: NativeCredentialRevocationConfig
   }): [ObjectHandle, ObjectHandle, ObjectHandle]
 
   encodeCredentialAttributes(attributeRawValues: Record<string, string>): Record<string, string>
@@ -99,8 +99,8 @@ export interface IndyCredx {
 
   createPresentation(options: {
     presentationRequest: ObjectHandle
-    credentials: CredentialEntry[]
-    credentialsProve: CredentialProve[]
+    credentials: NativeCredentialEntry[]
+    credentialsProve: NativeCredentialProve[]
     selfAttest: Record<string, string>
     masterSecret: ObjectHandle
     schemas: ObjectHandle[]
@@ -113,7 +113,7 @@ export interface IndyCredx {
     schemas: ObjectHandle[]
     credentialDefinitions: ObjectHandle[]
     revocationRegistryDefinitions: ObjectHandle[]
-    revocationEntries: RevocationEntry[]
+    revocationEntries: NativeRevocationEntry[]
   }): boolean
 
   createRevocationRegistry(options: {
@@ -148,13 +148,45 @@ export interface IndyCredx {
     previousRevocationState?: ObjectHandle
   }): ObjectHandle
 
-  presentationRequestFromJson(options: { json: string }): ObjectHandle
+  credentialGetAttribute(options: { object: ObjectHandle; name: string }): string
 
-  schemaGetAttribute(options: { schema: ObjectHandle; name: string }): string
+  credentialDefinitionGetAttribute(options: { object: ObjectHandle; name: string }): string
+
+  schemaGetAttribute(options: { object: ObjectHandle; name: string }): string
 
   revocationRegistryDefinitionGetAttribute(options: { object: ObjectHandle; name: string }): string
 
-  credentialGetAttribute(options: { object: ObjectHandle; name: string }): string
+  presentationRequestFromJson(options: { json: string }): ObjectHandle
+
+  revocationRegistryDefinitionFromJson(options: { json: string }): ObjectHandle
+
+  revocationRegistryFromJson(options: { json: string }): ObjectHandle
+
+  presentationFromJson(options: { json: string }): ObjectHandle
+
+  credentialOfferFromJson(options: { json: string }): ObjectHandle
+
+  schemaFromJson(options: { json: string }): ObjectHandle
+
+  masterSecretFromJson(options: { json: string }): ObjectHandle
+
+  credentialRequestFromJson(options: { json: string }): ObjectHandle
+
+  credentialRequestMetadataFromJson(options: { json: string }): ObjectHandle
+
+  credentialFromJson(options: { json: string }): ObjectHandle
+
+  revocationRegistryDefinitionPrivateFromJson(options: { json: string }): ObjectHandle
+
+  revocationRegistryDeltaFromJson(options: { json: string }): ObjectHandle
+
+  revocationStateFromJson(options: { json: string }): ObjectHandle
+
+  credentialDefinitionFromJson(options: { json: string }): ObjectHandle
+
+  credentialDefinitionPrivateFromJson(options: { json: string }): ObjectHandle
+
+  keyCorrectnessProofFromJson(options: { json: string }): ObjectHandle
 
   getJson(options: { object: ObjectHandle }): string
 
