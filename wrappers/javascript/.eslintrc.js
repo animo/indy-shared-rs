@@ -10,12 +10,7 @@ module.exports = {
   ],
   parserOptions: {
     tsconfigRootDir: __dirname,
-    project: [
-      './tsconfig.eslint.json',
-      './shared/tsconfig.json',
-      './nodejs/tsconfig.json',
-      './react-native/tsconfig.json',
-    ],
+    project: ['tsconfig.eslint.json', 'shared/tsconfig.json', 'nodejs/tsconfig.json', 'react-native/tsconfig.json'],
   },
   settings: {
     'import/extensions': ['.js', '.ts', '.jsx', '.tsx'],
@@ -25,11 +20,11 @@ module.exports = {
     'import/resolver': {
       typescript: {
         extensions: ['.js', '.jsx', '.ts', '.tsx'],
-        //project: ['./shared/tsconfig.json', './nodejs/tsconfig.json', './react-native/tsconfig.json'],
+        project: ['shared/tsconfig.json', 'nodejs/tsconfig.json', 'react-native/tsconfig.json'],
         alwaysTryTypes: true,
       },
       node: {
-        project: ['./shared/tsconfig.json', './nodejs/tsconfig.json', './react-native/tsconfig.json'],
+        project: ['shared/tsconfig.json', 'nodejs/tsconfig.json', 'react-native/tsconfig.json'],
         extensions: ['.js', '.jsx', '.ts', '.tsx'],
       },
     },
@@ -63,7 +58,7 @@ module.exports = {
   },
   overrides: [
     {
-      files: ['.eslintrc.js', 'babel.config.js'],
+      files: ['.eslintrc.js'],
       env: {
         node: true,
       },

@@ -7,6 +7,7 @@ import packageJson from './package.json'
 const config: Config.InitialOptions = {
   ...base,
   displayName: packageJson.name,
+  projects: [],
 }
 
 export default config

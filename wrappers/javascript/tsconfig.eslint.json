@@ -9,6 +9,6 @@
     },
     "types": ["node"]
   },
-  "include": [".eslintrc.js"],
+  "include": [".eslintrc.js", "jest.config.ts", "jest.config.base.ts"],
   "exclude": ["node_modules", "**/build/**", "build"]
 }
