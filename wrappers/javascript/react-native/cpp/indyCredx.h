@@ -35,6 +35,7 @@ jsi::Value revokeCredential(jsi::Runtime &rt, jsi::Object options);
 jsi::Value schemaGetAttribute(jsi::Runtime &rt, jsi::Object options);
 jsi::Value setDefaultLogger(jsi::Runtime &rt, jsi::Object options);
 jsi::Value verifyPresentation(jsi::Runtime &rt, jsi::Object options);
+jsi::Value updateRevocationRegistry(jsi::Runtime &rt, jsi::Object options);
 jsi::Value objectFree(jsi::Runtime &rt, jsi::Object options);
 
 } // namespace indyCredx

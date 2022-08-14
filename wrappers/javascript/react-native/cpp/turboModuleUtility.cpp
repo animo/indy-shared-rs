@@ -163,4 +163,20 @@ jsiToValue<std::vector<int32_t>>(jsi::Runtime &rt, jsi::Object &options,
   throw jsi::JSError(rt, errorPrefix + name + errorInfix + "Array<number>");
 }
 
+template <>
+ByteBuffer jsiToValue<ByteBuffer>(jsi::Runtime &rt, jsi::Object &options,
+                                  const char *name, bool optional) {
+  jsi::Value value = options.getProperty(rt, name);
+
+  if (value.isObject() && value.asObject(rt).isArrayBuffer(rt)) {
+    jsi::ArrayBuffer arrayBuffer = value.getObject(rt).getArrayBuffer(rt);
+    return ByteBuffer{int(arrayBuffer.size(rt)), arrayBuffer.data(rt)};
+  }
+
+  if (optional)
+    return ByteBuffer{0, 0};
+
+  throw jsi::JSError(rt, errorPrefix + name + errorInfix + "Uint8Array");
+}
+
 } // namespace turboModuleUtility

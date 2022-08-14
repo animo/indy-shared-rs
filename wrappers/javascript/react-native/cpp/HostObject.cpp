@@ -52,6 +52,8 @@ FunctionMap TurboModuleHostObject::functionMapping(jsi::Runtime &rt) {
       std::make_tuple("setDefaultLogger", &indyCredx::setDefaultLogger));
   fMap.insert(
       std::make_tuple("verifyPresentation", &indyCredx::verifyPresentation));
+  fMap.insert(std::make_tuple("updateRevocationRegistry",
+                              &indyCredx::updateRevocationRegistry));
   fMap.insert(std::make_tuple("objectFree", &indyCredx::objectFree));
 
   return fMap;
