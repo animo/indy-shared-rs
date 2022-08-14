@@ -1,7 +1,7 @@
 #pragma once
 
-#include <jsi/jsi.h>
 #include <include/libindy_credx.h>
+#include <jsi/jsi.h>
 #include <turboModuleUtility.h>
 
 using namespace facebook;
@@ -19,7 +19,8 @@ jsi::Value createOrUpdateRevocationState(jsi::Runtime &rt, jsi::Object options);
 jsi::Value createPresentation(jsi::Runtime &rt, jsi::Object options);
 jsi::Value createRevocationRegistry(jsi::Runtime &rt, jsi::Object options);
 jsi::Value createSchema(jsi::Runtime &rt, jsi::Object options);
-jsi::Value credentialDefinitionGetAttribute(jsi::Runtime &rt, jsi::Object options);
+jsi::Value credentialDefinitionGetAttribute(jsi::Runtime &rt,
+                                            jsi::Object options);
 jsi::Value credentialGetAttribute(jsi::Runtime &rt, jsi::Object options);
 jsi::Value encodeCredentialAttributes(jsi::Runtime &rt, jsi::Object options);
 jsi::Value generateNonce(jsi::Runtime &rt, jsi::Object options);
@@ -28,7 +29,8 @@ jsi::Value mergeRevocationRegistryDeltas(jsi::Runtime &rt, jsi::Object options);
 jsi::Value objectGetJson(jsi::Runtime &rt, jsi::Object options);
 jsi::Value objectGetTypeName(jsi::Runtime &rt, jsi::Object options);
 jsi::Value processCredential(jsi::Runtime &rt, jsi::Object options);
-jsi::Value revocationRegistryDefinitionGetAttribute(jsi::Runtime &rt, jsi::Object options);
+jsi::Value revocationRegistryDefinitionGetAttribute(jsi::Runtime &rt,
+                                                    jsi::Object options);
 jsi::Value revokeCredential(jsi::Runtime &rt, jsi::Object options);
 jsi::Value schemaGetAttribute(jsi::Runtime &rt, jsi::Object options);
 jsi::Value setDefaultLogger(jsi::Runtime &rt, jsi::Object options);

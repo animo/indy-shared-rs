@@ -8,6 +8,32 @@ FunctionMap TurboModuleHostObject::functionMapping(jsi::Runtime &rt) {
   FunctionMap fMap;
 
   fMap.insert(std::make_tuple("version", &indyCredx::version));
+  fMap.insert("bufferFree", &indyCredx::bufferFree));
+  fMap.insert("createCredential", &indyCredx::createCredential));
+  fMap.insert("createCredentialDefinition", &indyCredx::createCredentialDefinition));
+  fMap.insert("createCredentialOffer", &indyCredx::createCredentialOffer));
+  fMap.insert("createCredentialRequest", &indyCredx::createCredentialRequest));
+  fMap.insert("createMasterSecret", &indyCredx::createMasterSecret));
+  fMap.insert("createOrUpdateRevocationState", &indyCredx::createOrUpdateRevocationState));
+  fMap.insert("createPresentation", &indyCredx::createPresentation));
+  fMap.insert("createRevocationRegistry", &indyCredx::createRevocationRegistry));
+  fMap.insert("createSchema", &indyCredx::createSchema));
+  fMap.insert("credentialDefinitionGetAttribute", &indyCredx::credentialDefinitionGetAttribute));
+  fMap.insert("credentialGetAttribute", &indyCredx::credentialGetAttribute));
+  fMap.insert("encodeCredentialAttributes", &indyCredx::encodeCredentialAttributes));
+  fMap.insert("generateNonce", &indyCredx::generateNonce));
+  fMap.insert("getCurrentError", &indyCredx::getCurrentError));
+  fMap.insert("mergeRevocationRegistryDeltas", &indyCredx::mergeRevocationRegistryDeltas));
+  fMap.insert("objectGetJson", &indyCredx::objectGetJson));
+  fMap.insert("objectGetTypeName", &indyCredx::objectGetTypeName));
+  fMap.insert("processCredential", &indyCredx::processCredential));
+  fMap.insert("revocationRegistryDefinitionGetAttribute", &indyCredx::revocationRegistryDefinitionGetAttribute));
+  fMap.insert("revokeCredential", &indyCredx::revokeCredential));
+  fMap.insert("schemaGetAttribute", &indyCredx::schemaGetAttribute));
+  fMap.insert("setDefaultLogger", &indyCredx::setDefaultLogger));
+  fMap.insert("verifyPresentation", &indyCredx::verifyPresentation));
+  fMap.insert("objectFree", &indyCredx::objectFree));
+
   return fMap;
 }
 
