@@ -9,29 +9,49 @@ FunctionMap TurboModuleHostObject::functionMapping(jsi::Runtime &rt) {
 
   fMap.insert(std::make_tuple("version", &indyCredx::version));
   fMap.insert(std::make_tuple("bufferFree", &indyCredx::bufferFree));
-  fMap.insert(std::make_tuple("createCredential", &indyCredx::createCredential));
-  fMap.insert(std::make_tuple("createCredentialDefinition", &indyCredx::createCredentialDefinition));
-  fMap.insert(std::make_tuple("createCredentialOffer", &indyCredx::createCredentialOffer));
-  fMap.insert(std::make_tuple("createCredentialRequest", &indyCredx::createCredentialRequest));
-  fMap.insert(std::make_tuple("createMasterSecret", &indyCredx::createMasterSecret));
-  fMap.insert(std::make_tuple("createOrUpdateRevocationState", &indyCredx::createOrUpdateRevocationState));
-  fMap.insert(std::make_tuple("createPresentation", &indyCredx::createPresentation));
-  fMap.insert(std::make_tuple("createRevocationRegistry", &indyCredx::createRevocationRegistry));
+  fMap.insert(
+      std::make_tuple("createCredential", &indyCredx::createCredential));
+  fMap.insert(std::make_tuple("createCredentialDefinition",
+                              &indyCredx::createCredentialDefinition));
+  fMap.insert(std::make_tuple("createCredentialOffer",
+                              &indyCredx::createCredentialOffer));
+  fMap.insert(std::make_tuple("createCredentialRequest",
+                              &indyCredx::createCredentialRequest));
+  fMap.insert(
+      std::make_tuple("createMasterSecret", &indyCredx::createMasterSecret));
+  fMap.insert(std::make_tuple("createOrUpdateRevocationState",
+                              &indyCredx::createOrUpdateRevocationState));
+  fMap.insert(
+      std::make_tuple("createPresentation", &indyCredx::createPresentation));
+  fMap.insert(std::make_tuple("createRevocationRegistry",
+                              &indyCredx::createRevocationRegistry));
   fMap.insert(std::make_tuple("createSchema", &indyCredx::createSchema));
-  fMap.insert(std::make_tuple("credentialDefinitionGetAttribute", &indyCredx::credentialDefinitionGetAttribute));
-  fMap.insert(std::make_tuple("credentialGetAttribute", &indyCredx::credentialGetAttribute));
-  fMap.insert(std::make_tuple("encodeCredentialAttributes", &indyCredx::encodeCredentialAttributes));
+  fMap.insert(std::make_tuple("credentialDefinitionGetAttribute",
+                              &indyCredx::credentialDefinitionGetAttribute));
+  fMap.insert(std::make_tuple("credentialGetAttribute",
+                              &indyCredx::credentialGetAttribute));
+  fMap.insert(std::make_tuple("encodeCredentialAttributes",
+                              &indyCredx::encodeCredentialAttributes));
   fMap.insert(std::make_tuple("generateNonce", &indyCredx::generateNonce));
   fMap.insert(std::make_tuple("getCurrentError", &indyCredx::getCurrentError));
-  fMap.insert(std::make_tuple("mergeRevocationRegistryDeltas", &indyCredx::mergeRevocationRegistryDeltas));
+  fMap.insert(std::make_tuple("mergeRevocationRegistryDeltas",
+                              &indyCredx::mergeRevocationRegistryDeltas));
   fMap.insert(std::make_tuple("objectGetJson", &indyCredx::objectGetJson));
-  fMap.insert(std::make_tuple("objectGetTypeName", &indyCredx::objectGetTypeName));
-  fMap.insert(std::make_tuple("processCredential", &indyCredx::processCredential));
-  fMap.insert(std::make_tuple("revocationRegistryDefinitionGetAttribute", &indyCredx::revocationRegistryDefinitionGetAttribute));
-  fMap.insert(std::make_tuple("revokeCredential", &indyCredx::revokeCredential));
-  fMap.insert(std::make_tuple("schemaGetAttribute", &indyCredx::schemaGetAttribute));
-  fMap.insert(std::make_tuple("setDefaultLogger", &indyCredx::setDefaultLogger));
-  fMap.insert(std::make_tuple("verifyPresentation", &indyCredx::verifyPresentation));
+  fMap.insert(
+      std::make_tuple("objectGetTypeName", &indyCredx::objectGetTypeName));
+  fMap.insert(
+      std::make_tuple("processCredential", &indyCredx::processCredential));
+  fMap.insert(
+      std::make_tuple("revocationRegistryDefinitionGetAttribute",
+                      &indyCredx::revocationRegistryDefinitionGetAttribute));
+  fMap.insert(
+      std::make_tuple("revokeCredential", &indyCredx::revokeCredential));
+  fMap.insert(
+      std::make_tuple("schemaGetAttribute", &indyCredx::schemaGetAttribute));
+  fMap.insert(
+      std::make_tuple("setDefaultLogger", &indyCredx::setDefaultLogger));
+  fMap.insert(
+      std::make_tuple("verifyPresentation", &indyCredx::verifyPresentation));
   fMap.insert(std::make_tuple("objectFree", &indyCredx::objectFree));
 
   return fMap;
