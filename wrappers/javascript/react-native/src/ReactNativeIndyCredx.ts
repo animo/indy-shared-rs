@@ -4,10 +4,11 @@ import type {
   NativeCredentialProve,
   NativeCredentialRevocationConfig,
   NativeRevocationEntry,
-  ObjectHandle,
 } from 'indy-credx-shared'
+import { ObjectHandle } from 'indy-credx-shared'
 
 import { indyCredxReactNative } from './library'
+import { serializeArguments } from './utils'
 
 export class ReactNativeIndyCredx implements IndyCredx {
   public version(): string {
@@ -15,11 +16,11 @@ export class ReactNativeIndyCredx implements IndyCredx {
   }
 
   public getCurrentError(): string {
-    throw new Error('Method not implemented.')
+    return indyCredxReactNative.getCurrentError({})
   }
 
   public generateNonce(): string {
-    throw new Error('Method not implemented.')
+    return indyCredxReactNative.generateNonce({})
   }
 
   public createSchema(options: {
@@ -29,7 +30,8 @@ export class ReactNativeIndyCredx implements IndyCredx {
     attributeNames: string[]
     sequenceNumber?: number | undefined
   }): ObjectHandle {
-    throw new Error('Method not implemented.')
+    const handle = indyCredxReactNative.createSchema(serializeArguments(options))
+    return new ObjectHandle(handle)
   }
 
   public createCredentialDefinition(options: {
@@ -39,7 +41,8 @@ export class ReactNativeIndyCredx implements IndyCredx {
     signatureType: string
     supportRevocation: boolean
   }): [ObjectHandle, ObjectHandle, ObjectHandle] {
-    throw new Error('Method not implemented.')
+    const [handle1, handle2, handle3] = indyCredxReactNative.createCredentialDefinition(serializeArguments(options))
+    return [new ObjectHandle(handle1), new ObjectHandle(handle2), new ObjectHandle(handle3)]
   }
 
   public createCredential(options: {
@@ -51,11 +54,12 @@ export class ReactNativeIndyCredx implements IndyCredx {
     attributeEncodedValues?: Record<string, string> | undefined
     revocationConfiguration?: NativeCredentialRevocationConfig | undefined
   }): [ObjectHandle, ObjectHandle, ObjectHandle] {
-    throw new Error('Method not implemented.')
+    const [handle1, handle2, handle3] = indyCredxReactNative.createCredential(serializeArguments(options))
+    return [new ObjectHandle(handle1), new ObjectHandle(handle2), new ObjectHandle(handle3)]
   }
 
   public encodeCredentialAttributes(attributeRawValues: Record<string, string>): Record<string, string> {
-    throw new Error('Method not implemented.')
+    return indyCredxReactNative.encodeCredentialAttributes(serializeArguments({ attributeRawValues }))
   }
 
   public processCredential(options: {
@@ -65,7 +69,8 @@ export class ReactNativeIndyCredx implements IndyCredx {
     credentialDefinition: ObjectHandle
     revocationRegistryDefinition?: ObjectHandle | undefined
   }): ObjectHandle {
-    throw new Error('Method not implemented.')
+    const handle = indyCredxReactNative.processCredential(serializeArguments(options))
+    return new ObjectHandle(handle)
   }
 
   public revokeCredential(options: {
@@ -74,7 +79,8 @@ export class ReactNativeIndyCredx implements IndyCredx {
     credentialRevocationIndex: number
     tailsPath: string
   }): [ObjectHandle, ObjectHandle] {
-    throw new Error('Method not implemented.')
+    const [handle1, handle2] = indyCredxReactNative.revokeCredential(serializeArguments(options))
+    return [new ObjectHandle(handle1), new ObjectHandle(handle2)]
   }
 
   public createCredentialOffer(options: {
@@ -82,7 +88,8 @@ export class ReactNativeIndyCredx implements IndyCredx {
     credentialDefinition: ObjectHandle
     keyProof: ObjectHandle
   }): ObjectHandle {
-    throw new Error('Method not implemented.')
+    const handle = indyCredxReactNative.createCredentialOffer(serializeArguments(options))
+    return new ObjectHandle(handle)
   }
 
   public createCredentialRequest(options: {
@@ -92,11 +99,13 @@ export class ReactNativeIndyCredx implements IndyCredx {
     masterSecretId: string
     credentialOffer: ObjectHandle
   }): [ObjectHandle, ObjectHandle] {
-    throw new Error('Method not implemented.')
+    const [handle1, handle2] = indyCredxReactNative.createCredentialRequest(serializeArguments(options))
+    return [new ObjectHandle(handle1), new ObjectHandle(handle2)]
   }
 
   public createMasterSecret(): ObjectHandle {
-    throw new Error('Method not implemented.')
+    const handle = indyCredxReactNative.createMasterSecret({})
+    return new ObjectHandle(handle)
   }
 
   public createPresentation(options: {
@@ -108,7 +117,8 @@ export class ReactNativeIndyCredx implements IndyCredx {
     schemas: ObjectHandle[]
     credentialDefinitions: ObjectHandle[]
   }): ObjectHandle {
-    throw new Error('Method not implemented.')
+    const handle = indyCredxReactNative.createPresentation(serializeArguments(options))
+    return new ObjectHandle(handle)
   }
 
   public verifyPresentation(options: {
@@ -119,7 +129,7 @@ export class ReactNativeIndyCredx implements IndyCredx {
     revocationRegistryDefinitions: ObjectHandle[]
     revocationEntries: NativeRevocationEntry[]
   }): boolean {
-    throw new Error('Method not implemented.')
+    return indyCredxReactNative.verifyPresentation(serializeArguments(options))
   }
 
   public createRevocationRegistry(options: {
@@ -131,7 +141,10 @@ export class ReactNativeIndyCredx implements IndyCredx {
     maximumCredentialNumber: number
     tailsDirectoryPath?: string | undefined
   }): [ObjectHandle, ObjectHandle, ObjectHandle, ObjectHandle] {
-    throw new Error('Method not implemented.')
+    const [handle1, handle2, handle3, handle4] = indyCredxReactNative.createRevocationRegistry(
+      serializeArguments(options)
+    )
+    return [new ObjectHandle(handle1), new ObjectHandle(handle2), new ObjectHandle(handle3), new ObjectHandle(handle4)]
   }
 
   public updateRevocationRegistry(options: {
@@ -141,14 +154,16 @@ export class ReactNativeIndyCredx implements IndyCredx {
     revoked: number[]
     tailsDirectoryPath: string
   }): [ObjectHandle, ObjectHandle] {
-    throw new Error('Method not implemented.')
+    const [handle1, handle2] = indyCredxReactNative.updateRevocationRegistry(serializeArguments(options))
+    return [new ObjectHandle(handle1), new ObjectHandle(handle2)]
   }
 
   public mergeRevocationRegistryDeltas(options: {
     revocationRegistryDelta1: ObjectHandle
     revocationRegistryDelta2: ObjectHandle
   }): ObjectHandle {
-    throw new Error('Method not implemented.')
+    const handle = indyCredxReactNative.mergeRevocationRegistryDeltas(serializeArguments(options))
+    return new ObjectHandle(handle)
   }
 
   public createOrUpdateRevocationState(options: {
@@ -159,97 +174,114 @@ export class ReactNativeIndyCredx implements IndyCredx {
     tailsPath: string
     previousRevocationState?: ObjectHandle | undefined
   }): ObjectHandle {
-    throw new Error('Method not implemented.')
+    const handle = indyCredxReactNative.createOrUpdateRevocationState(serializeArguments(options))
+    return new ObjectHandle(handle)
   }
 
   public presentationRequestFromJson(options: { json: string }): ObjectHandle {
-    throw new Error('Method not implemented.')
+    const handle = indyCredxReactNative.presentationRequestFromJson(serializeArguments(options))
+    return new ObjectHandle(handle)
   }
 
   public schemaGetAttribute(options: { objectHandle: ObjectHandle; name: string }): string {
-    throw new Error('Method not implemented.')
+    return indyCredxReactNative.schemaGetAttribute(serializeArguments(options))
   }
 
   public revocationRegistryDefinitionGetAttribute(options: { objectHandle: ObjectHandle; name: string }): string {
-    throw new Error('Method not implemented.')
+    return indyCredxReactNative.revocationRegistryDefinitionGetAttribute(serializeArguments(options))
   }
 
   public credentialGetAttribute(options: { objectHandle: ObjectHandle; name: string }): string {
-    throw new Error('Method not implemented.')
+    return indyCredxReactNative.credentialGetAttribute(serializeArguments(options))
   }
 
   public getJson(options: { objectHandle: ObjectHandle }): string {
-    throw new Error('Method not implemented.')
+    return indyCredxReactNative.getJson(serializeArguments(options))
   }
 
   public getTypeName(options: { objectHandle: ObjectHandle }): string {
-    throw new Error('Method not implemented.')
+    return indyCredxReactNative.getTypeName(serializeArguments(options))
   }
 
   public objectFree(options: { objectHandle: ObjectHandle }): void {
-    throw new Error('Method not implemented.')
+    return indyCredxReactNative.objectFree(serializeArguments(options))
   }
 
   public credentialDefinitionGetAttribute(options: { objectHandle: ObjectHandle; name: string }): string {
-    throw new Error('Method not implemented.')
+    return indyCredxReactNative.credentialDefinitionGetAttribute(serializeArguments(options))
   }
 
   public revocationRegistryDefinitionFromJson(options: { json: string }): ObjectHandle {
-    throw new Error('Method not implemented.')
+    const handle = indyCredxReactNative.revocationRegistryFromJson(serializeArguments(options))
+    return new ObjectHandle(handle)
   }
 
   public revocationRegistryFromJson(options: { json: string }): ObjectHandle {
-    throw new Error('Method not implemented.')
+    const handle = indyCredxReactNative.revocationRegistryFromJson(serializeArguments(options))
+    return new ObjectHandle(handle)
   }
 
   public presentationFromJson(options: { json: string }): ObjectHandle {
-    throw new Error('Method not implemented.')
+    const handle = indyCredxReactNative.presentationFromJson(serializeArguments(options))
+    return new ObjectHandle(handle)
   }
 
   public credentialOfferFromJson(options: { json: string }): ObjectHandle {
-    throw new Error('Method not implemented.')
+    const handle = indyCredxReactNative.credentialFromJson(serializeArguments(options))
+    return new ObjectHandle(handle)
   }
 
   public schemaFromJson(options: { json: string }): ObjectHandle {
-    throw new Error('Method not implemented.')
+    const handle = indyCredxReactNative.schemaFromJson(serializeArguments(options))
+    return new ObjectHandle(handle)
   }
 
   public masterSecretFromJson(options: { json: string }): ObjectHandle {
-    throw new Error('Method not implemented.')
+    const handle = indyCredxReactNative.masterSecretFromJson(serializeArguments(options))
+    return new ObjectHandle(handle)
   }
 
   public credentialRequestFromJson(options: { json: string }): ObjectHandle {
-    throw new Error('Method not implemented.')
+    const handle = indyCredxReactNative.credentialRequestFromJson(serializeArguments(options))
+    return new ObjectHandle(handle)
   }
 
   public credentialRequestMetadataFromJson(options: { json: string }): ObjectHandle {
-    throw new Error('Method not implemented.')
+    const handle = indyCredxReactNative.credentialRequestMetadataFromJson(serializeArguments(options))
+    return new ObjectHandle(handle)
   }
 
   public credentialFromJson(options: { json: string }): ObjectHandle {
-    throw new Error('Method not implemented.')
+    const handle = indyCredxReactNative.credentialFromJson(serializeArguments(options))
+    return new ObjectHandle(handle)
   }
 
   public revocationRegistryDefinitionPrivateFromJson(options: { json: string }): ObjectHandle {
-    throw new Error('Method not implemented.')
+    const handle = indyCredxReactNative.revocationRegistryDefinitionPrivateFromJson(serializeArguments(options))
+    return new ObjectHandle(handle)
   }
 
   public revocationRegistryDeltaFromJson(options: { json: string }): ObjectHandle {
-    throw new Error('Method not implemented.')
+    const handle = indyCredxReactNative.revocationRegistryDeltaFromJson(serializeArguments(options))
+    return new ObjectHandle(handle)
   }
 
   public revocationStateFromJson(options: { json: string }): ObjectHandle {
-    throw new Error('Method not implemented.')
+    const handle = indyCredxReactNative.revocationStateFromJson(serializeArguments(options))
+    return new ObjectHandle(handle)
   }
   public credentialDefinitionFromJson(options: { json: string }): ObjectHandle {
-    throw new Error('Method not implemented.')
+    const handle = indyCredxReactNative.credentialDefinitionFromJson(serializeArguments(options))
+    return new ObjectHandle(handle)
   }
 
   public credentialDefinitionPrivateFromJson(options: { json: string }): ObjectHandle {
-    throw new Error('Method not implemented.')
+    const handle = indyCredxReactNative.credentialDefinitionPrivateFromJson(serializeArguments(options))
+    return new ObjectHandle(handle)
   }
 
   public keyCorrectnessProofFromJson(options: { json: string }): ObjectHandle {
-    throw new Error('Method not implemented.')
+    const handle = indyCredxReactNative.keyCorrectnessProofFromJson(serializeArguments(options))
+    return new ObjectHandle(handle)
   }
 }
