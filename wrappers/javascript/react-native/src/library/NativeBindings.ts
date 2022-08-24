@@ -1,12 +1,11 @@
-import {
-  number,
+import type {
   NativeCredentialEntry,
   NativeCredentialProve,
   NativeRevocationEntry,
   NativeCredentialRevocationConfig,
 } from 'indy-credx-shared'
 
-// Alias for _Handle
+// Alias for _Handle.handle
 type _Handle = number
 
 export interface NativeBindings {
@@ -18,7 +17,7 @@ export interface NativeBindings {
     name: string
     version: string
     attributeNames: string[]
-    sequenceNumber?: number | undefined
+    sequenceNumber?: number
   }): _Handle
   createCredentialDefinition(options: {
     originDid: string
@@ -26,30 +25,30 @@ export interface NativeBindings {
     tag: string
     signatureType: string
     supportRevocation: number
-  }): [_Handle, _Handle, _Handle]
+  }): { credentialDefinition: _Handle; credentialDefinitionPrivate: _Handle; keyProof: _Handle }
   createCredential(options: {
     credentialDefinition: number
     credentialDefinitionPrivate: number
     credentialOffer: number
     credentialRequest: number
     attributeRawValues: string
-    attributeEncodedValues?: string | undefined
-    revocationConfiguration?: string | undefined
-  }): [_Handle, _Handle, _Handle]
+    attributeEncodedValues?: string
+    revocationConfiguration?: NativeCredentialRevocationConfig
+  }): { credential: _Handle; revocationRegistry: _Handle; revocationDelta: _Handle }
   encodeCredentialAttributes(options: { attributeRawValues: string }): Record<string, string>
   processCredential(options: {
     credential: number
     credentialRequestMetadata: number
     masterSecret: number
     credentialDefinition: number
-    revocationRegistryDefinition?: number | undefined
+    revocationRegistryDefinition?: number
   }): _Handle
   revokeCredential(options: {
     revocationRegistryDefinition: number
     revocationRegistry: number
     credentialRevocationIndex: number
     tailsPath: string
-  }): [_Handle, _Handle]
+  }): { revocationRegistry: _Handle; revocationRegistryDelta: _Handle }
 
   createCredentialOffer(options: { schemaId: string; credentialDefinition: number; keyProof: number }): _Handle
 
@@ -59,14 +58,14 @@ export interface NativeBindings {
     masterSecret: number
     masterSecretId: string
     credentialOffer: number
-  }): [_Handle, _Handle]
+  }): { credentialRequest: _Handle; credentialRequestMeta: _Handle }
 
   createMasterSecret(options: Record<never, never>): number
 
   createPresentation(options: {
     presentationRequest: number
-    credentials: string[]
-    credentialsProve: string[]
+    credentials: NativeCredentialEntry[]
+    credentialsProve: NativeCredentialProve[]
     selfAttest: string
     masterSecret: number
     schemas: number[]
@@ -79,7 +78,7 @@ export interface NativeBindings {
     schemas: number[]
     credentialDefinitions: number[]
     revocationRegistryDefinitions: number[]
-    revocationEntries: string[]
+    revocationEntries: NativeRevocationEntry[]
   }): boolean
 
   createRevocationRegistry(options: {
@@ -87,10 +86,15 @@ export interface NativeBindings {
     credentialDefinition: number
     tag: string
     revocationRegistryType: string
-    issuanceType?: string | undefined
+    issuanceType?: string
     maximumCredentialNumber: number
-    tailsDirectoryPath?: string | undefined
-  }): [_Handle, _Handle, _Handle, _Handle]
+    tailsDirectoryPath?: string
+  }): {
+    registryDefinition: _Handle
+    registryDefinitionPrivate: _Handle
+    registryEntry: _Handle
+    registryInitDelta: _Handle
+  }
 
   updateRevocationRegistry(options: {
     revocationRegistryDefinition: number
@@ -98,7 +102,7 @@ export interface NativeBindings {
     issued: number[]
     revoked: number[]
     tailsDirectoryPath: string
-  }): [number, _Handle]
+  }): { revocationRegistry: _Handle; revocationRegistryDelta: _Handle }
 
   mergeRevocationRegistryDeltas(options: {
     revocationRegistryDelta1: number
@@ -111,7 +115,7 @@ export interface NativeBindings {
     revocationRegistryIndex: number
     timestamp: number
     tailsPath: string
-    previousRevocationState?: number | undefined
+    previousRevocationState?: number
   }): _Handle
   presentationRequestFromJson(options: { json: string }): _Handle
   schemaGetAttribute(options: { objectHandle: number; name: string }): string

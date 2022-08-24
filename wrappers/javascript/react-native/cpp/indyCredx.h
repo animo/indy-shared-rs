@@ -9,7 +9,6 @@ using namespace facebook;
 namespace indyCredx {
 
 jsi::Value version(jsi::Runtime &rt, jsi::Object options);
-jsi::Value bufferFree(jsi::Runtime &rt, jsi::Object options);
 jsi::Value createCredential(jsi::Runtime &rt, jsi::Object options);
 jsi::Value createCredentialDefinition(jsi::Runtime &rt, jsi::Object options);
 jsi::Value createCredentialOffer(jsi::Runtime &rt, jsi::Object options);

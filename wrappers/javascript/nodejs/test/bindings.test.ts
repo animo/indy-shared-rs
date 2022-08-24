@@ -1,5 +1,4 @@
 import { indyCredx } from 'indy-credx-shared'
-import { text } from 'stream/consumers'
 
 import { setup } from './utils'
 
@@ -58,7 +57,7 @@ describe('bindings', () => {
       attributeNames: ['attr-1'],
     })
 
-    const [credDefObj, credDefPvt, keyProof] = indyCredx.createCredentialDefinition({
+    const { keyProof, credentialDefinition, credentialDefinitionPrivate } = indyCredx.createCredentialDefinition({
       originDid: '55GkHamhTU1ZbTbV2ab9DE',
       schema: schemaObj,
       signatureType: 'CL',
@@ -66,7 +65,7 @@ describe('bindings', () => {
       tag: 'TAG',
     })
 
-    const credDefJson = indyCredx.getJson({ objectHandle: credDefObj })
+    const credDefJson = indyCredx.getJson({ objectHandle: credentialDefinition })
     expect(JSON.parse(credDefJson)).toEqual(
       expect.objectContaining({
         id: '55GkHamhTU1ZbTbV2ab9DE:3:CL:1:TAG',
@@ -77,7 +76,7 @@ describe('bindings', () => {
       })
     )
 
-    const credDefPvtJson = indyCredx.getJson({ objectHandle: credDefPvt })
+    const credDefPvtJson = indyCredx.getJson({ objectHandle: credentialDefinitionPrivate })
     expect(JSON.parse(credDefPvtJson)).toHaveProperty('value')
 
     const keyProofJson = indyCredx.getJson({ objectHandle: keyProof })
@@ -102,28 +101,28 @@ describe('bindings', () => {
         attributeNames: ['attr-1'],
       })
 
-      const [credDefObj, credDefPvt, keyProof] = indyCredx.createCredentialDefinition({
+      const { credentialDefinition } = indyCredx.createCredentialDefinition({
         originDid: '55GkHamhTU1ZbTbV2ab9DE',
         schema: schemaObj,
         signatureType: 'CL',
         supportRevocation: true,
         tag: 'TAG',
       })
-      const [revRegDef, revRegDefPrivate, revReg, revRegInitDelta] = indyCredx.createRevocationRegistry({
+      const { registryDefinition } = indyCredx.createRevocationRegistry({
         originDid: '55GkHamhTU1ZbTbV2ab9DE',
-        credentialDefinition: credDefObj,
+        credentialDefinition,
         tag: 'default',
         revocationRegistryType: 'CL_ACCUM',
         maximumCredentialNumber: 100,
       })
 
       const maximumCredentialNumber = indyCredx.revocationRegistryDefinitionGetAttribute({
-        objectHandle: revRegDef,
+        objectHandle: registryDefinition,
         name: 'max_cred_num',
       })
 
       expect(maximumCredentialNumber).toEqual('100')
-      const json = indyCredx.getJson({ objectHandle: revRegDef })
+      const json = indyCredx.getJson({ objectHandle: registryDefinition })
       expect(JSON.parse(json)).toEqual(
         expect.objectContaining({
           credDefId: '55GkHamhTU1ZbTbV2ab9DE:3:CL:1:TAG',
@@ -132,7 +131,7 @@ describe('bindings', () => {
           tag: 'default',
         })
       )
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+
       expect(JSON.parse(json).value).toEqual(
         expect.objectContaining({
           issuanceType: 'ISSUANCE_BY_DEFAULT',
@@ -145,7 +144,6 @@ describe('bindings', () => {
     const masterSecret = indyCredx.createMasterSecret()
     const json = indyCredx.getJson({ objectHandle: masterSecret })
     expect(JSON.parse(json)).toHaveProperty('value')
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     expect(JSON.parse(json).value).toHaveProperty('ms')
   })
 
@@ -158,7 +156,7 @@ describe('bindings', () => {
       attributeNames: ['attr-1'],
     })
 
-    const [credDefObj, credDefPvt, keyProof] = indyCredx.createCredentialDefinition({
+    const { credentialDefinition, keyProof } = indyCredx.createCredentialDefinition({
       originDid: '55GkHamhTU1ZbTbV2ab9DE',
       schema: schemaObj,
       signatureType: 'CL',
@@ -168,7 +166,7 @@ describe('bindings', () => {
 
     const credOfferObj = indyCredx.createCredentialOffer({
       schemaId: '55GkHamhTU1ZbTbV2ab9DE:2:schema-1:1',
-      credentialDefinition: credDefObj,
+      credentialDefinition: credentialDefinition,
       keyProof,
     })
 
@@ -192,7 +190,7 @@ describe('bindings', () => {
       attributeNames: ['attr-1'],
     })
 
-    const [credDefObj, credDefPvt, keyProof] = indyCredx.createCredentialDefinition({
+    const { credentialDefinition, keyProof } = indyCredx.createCredentialDefinition({
       originDid: '55GkHamhTU1ZbTbV2ab9DE',
       schema: schemaObj,
       signatureType: 'CL',
@@ -202,22 +200,22 @@ describe('bindings', () => {
 
     const credOfferObj = indyCredx.createCredentialOffer({
       schemaId: '55GkHamhTU1ZbTbV2ab9DE:2:schema-1:1',
-      credentialDefinition: credDefObj,
+      credentialDefinition: credentialDefinition,
       keyProof,
     })
 
     const masterSecret = indyCredx.createMasterSecret()
     const masterSecretId = 'master secret id'
 
-    const [credReq, credReqMetadata] = indyCredx.createCredentialRequest({
+    const { credentialRequest, credentialRequestMeta } = indyCredx.createCredentialRequest({
       proverDid: '55GkHamhTU1ZbTbV2ab9DE',
-      credentialDefinition: credDefObj,
+      credentialDefinition: credentialDefinition,
       masterSecret,
       masterSecretId,
       credentialOffer: credOfferObj,
     })
 
-    const credReqJson = indyCredx.getJson({ objectHandle: credReq })
+    const credReqJson = indyCredx.getJson({ objectHandle: credentialRequest })
     expect(JSON.parse(credReqJson)).toEqual(
       expect.objectContaining({
         prover_did: '55GkHamhTU1ZbTbV2ab9DE',
@@ -226,7 +224,7 @@ describe('bindings', () => {
     expect(JSON.parse(credReqJson)).toHaveProperty('blinded_ms')
     expect(JSON.parse(credReqJson)).toHaveProperty('nonce')
 
-    const credReqMetadataJson = indyCredx.getJson({ objectHandle: credReqMetadata })
+    const credReqMetadataJson = indyCredx.getJson({ objectHandle: credentialRequestMeta })
     expect(JSON.parse(credReqMetadataJson)).toEqual(
       expect.objectContaining({
         master_secret_name: masterSecretId,
@@ -245,7 +243,7 @@ describe('bindings', () => {
       attributeNames: ['attr-1'],
     })
 
-    const [credDefObj, credDefPvt, keyProof] = indyCredx.createCredentialDefinition({
+    const { credentialDefinition, keyProof, credentialDefinitionPrivate } = indyCredx.createCredentialDefinition({
       originDid: '55GkHamhTU1ZbTbV2ab9DE',
       schema: schemaObj,
       signatureType: 'CL',
@@ -255,59 +253,59 @@ describe('bindings', () => {
 
     const credOfferObj = indyCredx.createCredentialOffer({
       schemaId: '55GkHamhTU1ZbTbV2ab9DE:2:schema-1:1',
-      credentialDefinition: credDefObj,
+      credentialDefinition: credentialDefinition,
       keyProof,
     })
 
     const masterSecret = indyCredx.createMasterSecret()
     const masterSecretId = 'master secret id'
 
-    const [credReq, credReqMetadata] = indyCredx.createCredentialRequest({
+    const { credentialRequestMeta, credentialRequest } = indyCredx.createCredentialRequest({
       proverDid: '55GkHamhTU1ZbTbV2ab9DE',
-      credentialDefinition: credDefObj,
+      credentialDefinition,
       masterSecret,
       masterSecretId,
       credentialOffer: credOfferObj,
     })
 
-    const [revRegDef, revRegDefPrivate, revReg, revRegInitDelta] = indyCredx.createRevocationRegistry({
+    const { registryDefinition, registryEntry, registryDefinitionPrivate } = indyCredx.createRevocationRegistry({
       originDid: '55GkHamhTU1ZbTbV2ab9DE',
-      credentialDefinition: credDefObj,
+      credentialDefinition,
       tag: 'default',
       revocationRegistryType: 'CL_ACCUM',
       maximumCredentialNumber: 100,
     })
 
     const tailsPath = indyCredx.revocationRegistryDefinitionGetAttribute({
-      objectHandle: revRegDef,
+      objectHandle: registryDefinition,
       name: 'tails_location',
     })
 
-    const [cred, revRegUpdated, revDelta] = indyCredx.createCredential({
-      credentialDefinition: credDefObj,
-      credentialDefinitionPrivate: credDefPvt,
+    const { credential } = indyCredx.createCredential({
+      credentialDefinition: credentialDefinition,
+      credentialDefinitionPrivate: credentialDefinitionPrivate,
       credentialOffer: credOfferObj,
-      credentialRequest: credReq,
+      credentialRequest: credentialRequest,
       attributeRawValues: { 'attr-1': 'test' },
       attributeEncodedValues: undefined,
       revocationConfiguration: {
-        registryDefinition: revRegDef,
-        registryDefinitionPrivate: revRegDefPrivate,
-        registry: revReg,
+        registryDefinition,
+        registryDefinitionPrivate,
+        registry: registryEntry,
         registryIndex: 1,
         tailsPath: tailsPath,
       },
     })
 
     const credReceived = indyCredx.processCredential({
-      credential: cred,
-      credentialDefinition: credDefObj,
-      credentialRequestMetadata: credReqMetadata,
+      credential,
+      credentialDefinition,
+      credentialRequestMetadata: credentialRequestMeta,
       masterSecret,
-      revocationRegistryDefinition: revRegDef,
+      revocationRegistryDefinition: registryDefinition,
     })
 
-    const credJson = indyCredx.getJson({ objectHandle: cred })
+    const credJson = indyCredx.getJson({ objectHandle: credential })
     expect(JSON.parse(credJson)).toEqual(
       expect.objectContaining({
         cred_def_id: '55GkHamhTU1ZbTbV2ab9DE:3:CL:1:TAG',
@@ -362,7 +360,7 @@ describe('bindings', () => {
       attributeNames: ['attr-1'],
     })
 
-    const [credDefObj, credDefPvt, keyProof] = indyCredx.createCredentialDefinition({
+    const { credentialDefinition, credentialDefinitionPrivate, keyProof } = indyCredx.createCredentialDefinition({
       originDid: '55GkHamhTU1ZbTbV2ab9DE',
       schema: schemaObj,
       signatureType: 'CL',
@@ -372,60 +370,61 @@ describe('bindings', () => {
 
     const credOfferObj = indyCredx.createCredentialOffer({
       schemaId: '55GkHamhTU1ZbTbV2ab9DE:2:schema-1:1',
-      credentialDefinition: credDefObj,
+      credentialDefinition,
       keyProof,
     })
 
     const masterSecret = indyCredx.createMasterSecret()
     const masterSecretId = 'master secret id'
 
-    const [credReq, credReqMetadata] = indyCredx.createCredentialRequest({
+    const { credentialRequest } = indyCredx.createCredentialRequest({
       proverDid: '55GkHamhTU1ZbTbV2ab9DE',
-      credentialDefinition: credDefObj,
+      credentialDefinition,
       masterSecret,
       masterSecretId,
       credentialOffer: credOfferObj,
     })
 
-    const [revRegDef, revRegDefPrivate, revReg, revRegInitDelta] = indyCredx.createRevocationRegistry({
-      originDid: '55GkHamhTU1ZbTbV2ab9DE',
-      credentialDefinition: credDefObj,
-      tag: 'default',
-      revocationRegistryType: 'CL_ACCUM',
-      maximumCredentialNumber: 100,
-    })
+    const { registryDefinition, registryEntry, registryDefinitionPrivate, registryInitDelta } =
+      indyCredx.createRevocationRegistry({
+        originDid: '55GkHamhTU1ZbTbV2ab9DE',
+        credentialDefinition,
+        tag: 'default',
+        revocationRegistryType: 'CL_ACCUM',
+        maximumCredentialNumber: 100,
+      })
 
     const tailsPath = indyCredx.revocationRegistryDefinitionGetAttribute({
-      objectHandle: revRegDef,
+      objectHandle: registryDefinition,
       name: 'tails_location',
     })
 
-    const [cred, revRegUpdated, revDelta] = indyCredx.createCredential({
-      credentialDefinition: credDefObj,
-      credentialDefinitionPrivate: credDefPvt,
+    const { credential } = indyCredx.createCredential({
+      credentialDefinition,
+      credentialDefinitionPrivate,
       credentialOffer: credOfferObj,
-      credentialRequest: credReq,
+      credentialRequest,
       attributeRawValues: { 'attr-1': 'test' },
       attributeEncodedValues: undefined,
       revocationConfiguration: {
-        registryDefinition: revRegDef,
-        registryDefinitionPrivate: revRegDefPrivate,
-        registry: revReg,
+        registryDefinition,
+        registryDefinitionPrivate,
+        registry: registryEntry,
         registryIndex: 1,
         tailsPath: tailsPath,
       },
     })
 
     const revRegIndex = indyCredx.credentialGetAttribute({
-      objectHandle: cred,
+      objectHandle: credential,
       name: 'rev_reg_index',
     })
 
     const revocationRegistryIndex = revRegIndex === null ? 0 : parseInt(revRegIndex)
 
     const revocationState = indyCredx.createOrUpdateRevocationState({
-      revocationRegistryDefinition: revRegDef,
-      revocationRegistryDelta: revRegInitDelta,
+      revocationRegistryDefinition: registryDefinition,
+      revocationRegistryDelta: registryInitDelta,
       revocationRegistryIndex,
       timestamp,
       tailsPath,
@@ -435,12 +434,12 @@ describe('bindings', () => {
       presentationRequest: presRequestObj,
       credentials: [
         {
-          credential: cred,
+          credential,
           revocationState,
           timestamp,
         },
       ],
-      credentialDefinitions: [credDefObj],
+      credentialDefinitions: [credentialDefinition],
       credentialsProve: [
         {
           entryIndex: 0,
@@ -457,11 +456,11 @@ describe('bindings', () => {
     const verify = indyCredx.verifyPresentation({
       presentation: presentationObj,
       presentationRequest: presRequestObj,
-      credentialDefinitions: [credDefObj],
-      revocationRegistryDefinitions: [revRegDef],
+      credentialDefinitions: [credentialDefinition],
+      revocationRegistryDefinitions: [registryDefinition],
       revocationEntries: [
         {
-          entry: revReg,
+          entry: registryEntry,
           revocationRegistryDefinitionEntryIndex: 0,
           timestamp,
         },

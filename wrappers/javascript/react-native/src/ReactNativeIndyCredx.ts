@@ -5,6 +5,7 @@ import type {
   NativeCredentialRevocationConfig,
   NativeRevocationEntry,
 } from 'indy-credx-shared'
+
 import { ObjectHandle } from 'indy-credx-shared'
 
 import { indyCredxReactNative } from './library'
@@ -28,7 +29,7 @@ export class ReactNativeIndyCredx implements IndyCredx {
     name: string
     version: string
     attributeNames: string[]
-    sequenceNumber?: number | undefined
+    sequenceNumber?: number
   }): ObjectHandle {
     const handle = indyCredxReactNative.createSchema(serializeArguments(options))
     return new ObjectHandle(handle)
@@ -40,9 +41,15 @@ export class ReactNativeIndyCredx implements IndyCredx {
     tag: string
     signatureType: string
     supportRevocation: boolean
-  }): [ObjectHandle, ObjectHandle, ObjectHandle] {
-    const [handle1, handle2, handle3] = indyCredxReactNative.createCredentialDefinition(serializeArguments(options))
-    return [new ObjectHandle(handle1), new ObjectHandle(handle2), new ObjectHandle(handle3)]
+  }): { credentialDefinition: ObjectHandle; credentialDefinitionPrivate: ObjectHandle; keyProof: ObjectHandle } {
+    const { keyProof, credentialDefinition, credentialDefinitionPrivate } =
+      indyCredxReactNative.createCredentialDefinition(serializeArguments(options))
+
+    return {
+      credentialDefinitionPrivate: new ObjectHandle(credentialDefinitionPrivate),
+      credentialDefinition: new ObjectHandle(credentialDefinition),
+      keyProof: new ObjectHandle(keyProof),
+    }
   }
 
   public createCredential(options: {
@@ -51,11 +58,18 @@ export class ReactNativeIndyCredx implements IndyCredx {
     credentialOffer: ObjectHandle
     credentialRequest: ObjectHandle
     attributeRawValues: Record<string, string>
-    attributeEncodedValues?: Record<string, string> | undefined
-    revocationConfiguration?: NativeCredentialRevocationConfig | undefined
-  }): [ObjectHandle, ObjectHandle, ObjectHandle] {
-    const [handle1, handle2, handle3] = indyCredxReactNative.createCredential(serializeArguments(options))
-    return [new ObjectHandle(handle1), new ObjectHandle(handle2), new ObjectHandle(handle3)]
+    attributeEncodedValues?: Record<string, string>
+    revocationConfiguration?: NativeCredentialRevocationConfig
+  }): { credential: ObjectHandle; revocationRegistry: ObjectHandle; revocationDelta: ObjectHandle } {
+    const { credential, revocationDelta, revocationRegistry } = indyCredxReactNative.createCredential(
+      serializeArguments(options)
+    )
+
+    return {
+      revocationRegistry: new ObjectHandle(revocationRegistry),
+      credential: new ObjectHandle(credential),
+      revocationDelta: new ObjectHandle(revocationDelta),
+    }
   }
 
   public encodeCredentialAttributes(attributeRawValues: Record<string, string>): Record<string, string> {
@@ -67,7 +81,7 @@ export class ReactNativeIndyCredx implements IndyCredx {
     credentialRequestMetadata: ObjectHandle
     masterSecret: ObjectHandle
     credentialDefinition: ObjectHandle
-    revocationRegistryDefinition?: ObjectHandle | undefined
+    revocationRegistryDefinition?: ObjectHandle
   }): ObjectHandle {
     const handle = indyCredxReactNative.processCredential(serializeArguments(options))
     return new ObjectHandle(handle)
@@ -78,9 +92,15 @@ export class ReactNativeIndyCredx implements IndyCredx {
     revocationRegistry: ObjectHandle
     credentialRevocationIndex: number
     tailsPath: string
-  }): [ObjectHandle, ObjectHandle] {
-    const [handle1, handle2] = indyCredxReactNative.revokeCredential(serializeArguments(options))
-    return [new ObjectHandle(handle1), new ObjectHandle(handle2)]
+  }): { revocationRegistry: ObjectHandle; revocationRegistryDelta: ObjectHandle } {
+    const { revocationRegistry, revocationRegistryDelta } = indyCredxReactNative.revokeCredential(
+      serializeArguments(options)
+    )
+
+    return {
+      revocationRegistryDelta: new ObjectHandle(revocationRegistryDelta),
+      revocationRegistry: new ObjectHandle(revocationRegistry),
+    }
   }
 
   public createCredentialOffer(options: {
@@ -98,9 +118,15 @@ export class ReactNativeIndyCredx implements IndyCredx {
     masterSecret: ObjectHandle
     masterSecretId: string
     credentialOffer: ObjectHandle
-  }): [ObjectHandle, ObjectHandle] {
-    const [handle1, handle2] = indyCredxReactNative.createCredentialRequest(serializeArguments(options))
-    return [new ObjectHandle(handle1), new ObjectHandle(handle2)]
+  }): { credentialRequest: ObjectHandle; credentialRequestMeta: ObjectHandle } {
+    const { credentialRequest, credentialRequestMeta } = indyCredxReactNative.createCredentialRequest(
+      serializeArguments(options)
+    )
+
+    return {
+      credentialRequestMeta: new ObjectHandle(credentialRequestMeta),
+      credentialRequest: new ObjectHandle(credentialRequest),
+    }
   }
 
   public createMasterSecret(): ObjectHandle {
@@ -137,14 +163,24 @@ export class ReactNativeIndyCredx implements IndyCredx {
     credentialDefinition: ObjectHandle
     tag: string
     revocationRegistryType: string
-    issuanceType?: string | undefined
+    issuanceType?: string
     maximumCredentialNumber: number
-    tailsDirectoryPath?: string | undefined
-  }): [ObjectHandle, ObjectHandle, ObjectHandle, ObjectHandle] {
-    const [handle1, handle2, handle3, handle4] = indyCredxReactNative.createRevocationRegistry(
-      serializeArguments(options)
-    )
-    return [new ObjectHandle(handle1), new ObjectHandle(handle2), new ObjectHandle(handle3), new ObjectHandle(handle4)]
+    tailsDirectoryPath?: string
+  }): {
+    registryDefinition: ObjectHandle
+    registryDefinitionPrivate: ObjectHandle
+    registryEntry: ObjectHandle
+    registryInitDelta: ObjectHandle
+  } {
+    const { registryEntry, registryInitDelta, registryDefinition, registryDefinitionPrivate } =
+      indyCredxReactNative.createRevocationRegistry(serializeArguments(options))
+
+    return {
+      registryDefinitionPrivate: new ObjectHandle(registryDefinitionPrivate),
+      registryDefinition: new ObjectHandle(registryDefinition),
+      registryInitDelta: new ObjectHandle(registryInitDelta),
+      registryEntry: new ObjectHandle(registryEntry),
+    }
   }
 
   public updateRevocationRegistry(options: {
@@ -153,9 +189,15 @@ export class ReactNativeIndyCredx implements IndyCredx {
     issued: number[]
     revoked: number[]
     tailsDirectoryPath: string
-  }): [ObjectHandle, ObjectHandle] {
-    const [handle1, handle2] = indyCredxReactNative.updateRevocationRegistry(serializeArguments(options))
-    return [new ObjectHandle(handle1), new ObjectHandle(handle2)]
+  }): { revocationRegistry: ObjectHandle; revocationRegistryDelta: ObjectHandle } {
+    const { revocationRegistry, revocationRegistryDelta } = indyCredxReactNative.updateRevocationRegistry(
+      serializeArguments(options)
+    )
+
+    return {
+      revocationRegistryDelta: new ObjectHandle(revocationRegistryDelta),
+      revocationRegistry: new ObjectHandle(revocationRegistry),
+    }
   }
 
   public mergeRevocationRegistryDeltas(options: {
@@ -172,7 +214,7 @@ export class ReactNativeIndyCredx implements IndyCredx {
     revocationRegistryIndex: number
     timestamp: number
     tailsPath: string
-    previousRevocationState?: ObjectHandle | undefined
+    previousRevocationState?: ObjectHandle
   }): ObjectHandle {
     const handle = indyCredxReactNative.createOrUpdateRevocationState(serializeArguments(options))
     return new ObjectHandle(handle)

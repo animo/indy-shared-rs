@@ -15,7 +15,10 @@
   "publishConfig": {
     "access": "public"
   },
-  "files": ["build","README.md", "../../../LICENSE"],
+  "files": [
+    "build",
+    "README.md"
+  ],
   "scripts": {
     "build": "yarn run clean && yarn run compile",
     "clean": "rimraf -rf ./build",

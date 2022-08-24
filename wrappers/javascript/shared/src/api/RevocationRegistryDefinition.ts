@@ -19,21 +19,22 @@ export type CreateRevocationRegistryDefinitionOptions = {
 
 export class RevocationRegistryDefinition extends IndyObject {
   public static create(options: CreateRevocationRegistryDefinitionOptions) {
-    const [regDef, regDefPrivate, regEntry, regInitDelta] = indyCredx.createRevocationRegistry({
-      originDid: options.originDid,
-      credentialDefinition: options.credentialDefinition.handle,
-      tag: options.tag,
-      revocationRegistryType: options.revocationRegistryType,
-      issuanceType: options.issuanceType,
-      maximumCredentialNumber: options.maximumCredentialNumber,
-      tailsDirectoryPath: options.tailsDirectoryPath,
-    })
+    const { registryDefinition, registryDefinitionPrivate, registryEntry, registryInitDelta } =
+      indyCredx.createRevocationRegistry({
+        originDid: options.originDid,
+        credentialDefinition: options.credentialDefinition.handle,
+        tag: options.tag,
+        revocationRegistryType: options.revocationRegistryType,
+        issuanceType: options.issuanceType,
+        maximumCredentialNumber: options.maximumCredentialNumber,
+        tailsDirectoryPath: options.tailsDirectoryPath,
+      })
 
     return {
-      revocationRegistryDefinition: new RevocationRegistryDefinition(regDef.handle),
-      revocationRegistryDefinitionPrivate: new RevocationRegistryDefinitionPrivate(regDefPrivate.handle),
-      revocationRegistry: new RevocationRegistry(regEntry.handle),
-      revocationRegistryDelta: new RevocationRegistryDelta(regInitDelta.handle),
+      revocationRegistryDefinition: new RevocationRegistryDefinition(registryDefinition.handle),
+      revocationRegistryDefinitionPrivate: new RevocationRegistryDefinitionPrivate(registryDefinitionPrivate.handle),
+      revocationRegistry: new RevocationRegistry(registryEntry.handle),
+      revocationRegistryDelta: new RevocationRegistryDelta(registryInitDelta.handle),
     }
   }
 

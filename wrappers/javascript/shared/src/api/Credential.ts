@@ -32,7 +32,7 @@ export type ProcessCredentialOptions = {
 
 export class Credential extends IndyObject {
   public static create(options: CreateCredentialOptions) {
-    const [cred, revReg, revDelta] = indyCredx.createCredential({
+    const { credential, revocationDelta, revocationRegistry } = indyCredx.createCredential({
       credentialDefinition: options.credentialDefinition.handle,
       credentialDefinitionPrivate: options.credentialDefinitionPrivate.handle,
       credentialRequest: options.credentialRequest.handle,
@@ -43,9 +43,9 @@ export class Credential extends IndyObject {
     })
 
     return {
-      credential: new Credential(cred.handle),
-      revocationRegistry: revReg ? new RevocationRegistry(revReg.handle) : undefined,
-      revocationRegistryDelta: revDelta ? new RevocationRegistryDelta(revDelta.handle) : undefined,
+      credential: new Credential(credential.handle),
+      revocationRegistry: revocationRegistry ? new RevocationRegistry(revocationRegistry.handle) : undefined,
+      revocationRegistryDelta: revocationDelta ? new RevocationRegistryDelta(revocationDelta.handle) : undefined,
     }
   }
 

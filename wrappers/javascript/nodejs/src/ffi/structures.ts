@@ -1,19 +1,16 @@
-import { default as array } from 'ref-array-di'
+import RefArray from 'ref-array-di'
 import * as ref from 'ref-napi'
-import { default as struct } from 'ref-struct-di'
+import RefStruct from 'ref-struct-di'
 
-import { FFI_INT64, FFI_INT8, FFI_ISIZE, FFI_ISIZE_PTR, FFI_UINT, FFI_UINT8, FFI_STRING } from './primitives'
+import { FFI_INT64, FFI_INT8, FFI_ISIZE, FFI_STRING } from './primitives'
 
-const CStruct = struct(ref)
-const CArray = array(ref)
+const CStruct = RefStruct(ref)
+const CArray = RefArray(ref)
 
 export const StringArray = CArray('string')
 
-const FFI_UINT8_ARRAY = CArray(FFI_UINT8)
-
 const FFI_INT64_ARRAY = CArray('int64')
 const FFI_INT64_ARRAY_PTR = ref.refType(FFI_INT64_ARRAY)
-const FFI_UINT8_ARRAY_PTR = ref.refType(FFI_UINT8_ARRAY)
 
 export const ByteBufferArray = CArray('uint8')
 export const ByteBufferArrayPtr = ref.refType(FFI_STRING)

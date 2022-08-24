@@ -16,7 +16,7 @@ export type CreateCredentialDefinitionOptions = {
 
 export class CredentialDefinition extends IndyObject {
   public static create(options: CreateCredentialDefinitionOptions) {
-    const [credDef, credDefPvt, keyProof] = indyCredx.createCredentialDefinition({
+    const { credentialDefinition, credentialDefinitionPrivate, keyProof } = indyCredx.createCredentialDefinition({
       originDid: options.originDid,
       schema: options.schema.handle,
       signatureType: options.signatureType,
@@ -25,8 +25,8 @@ export class CredentialDefinition extends IndyObject {
     })
 
     return {
-      credentialDefinition: new CredentialDefinition(credDef.handle),
-      credentialDefinitionPrivate: new CredentialDefinitionPrivate(credDefPvt.handle),
+      credentialDefinition: new CredentialDefinition(credentialDefinition.handle),
+      credentialDefinitionPrivate: new CredentialDefinitionPrivate(credentialDefinitionPrivate.handle),
       keyCorrectnessProof: new KeyCorrectnessProof(keyProof.handle),
     }
   }
