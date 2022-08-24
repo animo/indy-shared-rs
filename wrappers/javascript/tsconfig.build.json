@@ -9,14 +9,8 @@
     "lib": ["ESNext"],
     "types": [],
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
-    "baseUrl": ".",
-    "paths": {
-      "indy-credx-shared": ["shared/src"],
-      "indy-credx-react-native": ["react-native/src"],
-      "indy-credx-nodejs": ["nodejs/src"]
-    }
+    "baseUrl": "."
   },
   "exclude": ["node_modules", "build", "**/build/**"]
 }

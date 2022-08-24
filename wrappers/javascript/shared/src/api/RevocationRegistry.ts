@@ -24,20 +24,20 @@ export class RevocationRegistry extends IndyObject {
   }
 
   public revokeCredential(options: RevokeCredentialOptions) {
-    const [handle, revDelta] = indyCredx.revokeCredential({
+    const { revocationRegistry, revocationRegistryDelta } = indyCredx.revokeCredential({
       revocationRegistryDefinition: options.revocationRegistryDefinition.handle,
       revocationRegistry: this._handle,
       credentialRevocationIndex: options.credentialRevocationIndex,
       tailsPath: options.tailsPath,
     })
 
-    this._handle = handle
+    this._handle = revocationRegistry
 
-    return new RevocationRegistryDelta(revDelta.handle)
+    return new RevocationRegistryDelta(revocationRegistryDelta.handle)
   }
 
   public update(options: UpdateRevocationRegistryOptions) {
-    const [handle, revDelta] = indyCredx.updateRevocationRegistry({
+    const { revocationRegistry, revocationRegistryDelta } = indyCredx.updateRevocationRegistry({
       revocationRegistryDefinition: options.revocationRegistryDefinition.handle,
       revocationRegistry: this._handle,
       issued: options.issued,
@@ -45,8 +45,8 @@ export class RevocationRegistry extends IndyObject {
       tailsDirectoryPath: options.tailsDirectoryPath,
     })
 
-    this._handle = handle
+    this._handle = revocationRegistry
 
-    return new RevocationRegistryDelta(revDelta.handle)
+    return new RevocationRegistryDelta(revocationRegistryDelta.handle)
   }
 }

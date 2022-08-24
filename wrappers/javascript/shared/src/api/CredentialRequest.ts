@@ -17,7 +17,7 @@ export type CreateCredentialRequestOptions = {
 
 export class CredentialRequest extends IndyObject {
   public static create(options: CreateCredentialRequestOptions) {
-    const [credReq, credReqMetadata] = indyCredx.createCredentialRequest({
+    const { credentialRequest, credentialRequestMeta } = indyCredx.createCredentialRequest({
       proverDid: options.proverDid,
       credentialDefinition: options.credentialDefinition.handle,
       masterSecret: options.masterSecret.handle,
@@ -26,8 +26,8 @@ export class CredentialRequest extends IndyObject {
     })
 
     return {
-      credentialRequest: new CredentialRequest(credReq.handle),
-      credentialRequestMetadata: new CredentialRequestMetadata(credReqMetadata.handle),
+      credentialRequest: new CredentialRequest(credentialRequest.handle),
+      credentialRequestMetadata: new CredentialRequestMetadata(credentialRequestMeta.handle),
     }
   }
 

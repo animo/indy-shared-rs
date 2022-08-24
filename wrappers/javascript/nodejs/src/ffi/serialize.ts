@@ -3,7 +3,7 @@ import type { ByteBufferStruct } from './structures'
 import { ObjectHandle } from 'indy-credx-shared'
 import { NULL } from 'ref-napi'
 
-import { ObjectHandleListStruct, StringListStruct } from './structures'
+import { ObjectHandleListStruct, StringListStruct, I64ListStruct, Int64Array } from './structures'
 
 type Argument =
   | Record<string, unknown>
@@ -74,12 +74,15 @@ const serialize = (arg: Argument): SerializedArgument => {
         return arg.handle
       } else if (Array.isArray(arg)) {
         if (arg.every((it) => typeof it === 'string')) {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           return StringListStruct({ count: arg.length, data: arg })
         } else if (arg.every((it) => it instanceof ObjectHandle)) {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           return ObjectHandleListStruct({ count: arg.length, data: arg.map((item: ObjectHandle) => item.handle) })
         } else if (arg.every((it) => typeof it === 'number')) {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           return I64ListStruct({ count: arg.length, data: Int64Array(arg) })
         }

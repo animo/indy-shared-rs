@@ -10,14 +10,6 @@ jsi::Value version(jsi::Runtime &rt, jsi::Object options) {
   return jsi::String::createFromAscii(rt, credx_version());
 };
 
-jsi::Value bufferFree(jsi::Runtime &rt, jsi::Object options) {
-  auto buffer = jsiToValue<ByteBuffer>(rt, options, "buffer");
-
-  credx_buffer_free(buffer);
-
-  return jsi::Value::null();
-};
-
 jsi::Value createCredential(jsi::Runtime &rt, jsi::Object options) {
   auto credDef = jsiToValue<ObjectHandle>(rt, options, "credDef");
   auto credDefPrivate = jsiToValue<ObjectHandle>(rt, options, "credDefPrivate");
@@ -28,104 +20,106 @@ jsi::Value createCredential(jsi::Runtime &rt, jsi::Object options) {
   auto attrEncValues = jsiToValue<FfiStrList>(rt, options, "attrEncValues");
   auto revocation = jsiToValue<FfiCredRevInfo>(rt, options, "revocation");
 
-  ObjectHandle credP;
-  ObjectHandle revRegP;
-  ObjectHandle revDeltaP;
+  ObjectHandle *credP;
+  ObjectHandle *revRegP;
+  ObjectHandle *revDeltaP;
 
   ErrorCode code = credx_create_credential(
-      credDef, credDefPrivate, credoffer, credRequest, attrNames, attrRawValues,
-      attrEncvalues, revocation, credP, revRegP, revDeltaP);
+      credDef, credDefPrivate, credOffer, credRequest, attrNames, attrRawValues,
+      attrEncValues, &revocation, credP, revRegP, revDeltaP);
   handleError(rt, code);
 
   jsi::Object object = jsi::Object(rt);
-  object.setProperty(rt, "cred", credP);
-  object.setProperty(rt, "revReg", revRegP);
-  object.setProperty(rt, "revDelta", revDeltaP);
+  object.setProperty(rt, "cred", int(*credP));
+  object.setProperty(rt, "revReg", int(*revRegP));
+  object.setProperty(rt, "revDelta", int(*revDeltaP));
   return object;
 };
 
 jsi::Value createCredentialDefinition(jsi::Runtime &rt, jsi::Object options) {
-  auto originDid = jsiToValue<FfiStr>(rt, options, "originDid");
+  auto originDid = jsiToValue<std::string>(rt, options, "originDid");
   auto schema = jsiToValue<ObjectHandle>(rt, options, "schema");
-  auto tag = jsiToValue<FfiStr>(rt, options, "tag");
-  auto signatureType = jsiToValue<FfiStr>(rt, options, "signatureType");
+  auto tag = jsiToValue<std::string>(rt, options, "tag");
+  auto signatureType = jsiToValue<std::string>(rt, options, "signatureType");
   auto supportRevocation = jsiToValue<int8_t>(rt, options, "supportRevocation");
 
-  ObjectHandle credDefP;
-  ObjectHandle credDefPvtP;
-  ObjectHandle keyProofP;
+  ObjectHandle *credDefP;
+  ObjectHandle *credDefPvtP;
+  ObjectHandle *keyProofP;
 
   ErrorCode code = credx_create_credential_definition(
-      originDid, schema, tag, signatureType, supportRevocation, credDefP,
-      credDefPvtP, keyProofP);
+      originDid.c_str(), schema, tag.c_str(), signatureType.c_str(),
+      supportRevocation, credDefP, credDefPvtP, keyProofP);
   handleError(rt, code);
 
   jsi::Object object = jsi::Object(rt);
-  object.setProperty(rt, "credDef", credDefP);
-  object.setProperty(rt, "credDevPvt", credDevPvtP);
-  object.setProperty(rt, "keyProof", keyProofP);
+  object.setProperty(rt, "credDef", int(*credDefP));
+  object.setProperty(rt, "credDevPvt", int(*credDefPvtP));
+  object.setProperty(rt, "keyProof", int(*keyProofP));
   return object;
 };
 
 jsi::Value createCredentialOffer(jsi::Runtime &rt, jsi::Object options) {
-  auto schemaId = jsiToValue<FfiStr>(rt, options, "schemaId");
+  auto schemaId = jsiToValue<std::string>(rt, options, "schemaId");
   auto credDef = jsiToValue<ObjectHandle>(rt, options, "credDef");
   auto keyProof = jsiToValue<ObjectHandle>(rt, options, "keyProof");
 
-  Objecthandle credOfferP;
+  ObjectHandle *credOfferP;
 
-  ErrorCode code =
-      credx_create_credential_offer(schemaId, credDef, keyProof, credOfferP);
+  ErrorCode code = credx_create_credential_offer(schemaId.c_str(), credDef,
+                                                 keyProof, credOfferP);
   handleError(rt, code);
 
-  return jsi::Value(credOfferP);
+  return jsi::Value(int(*credOfferP));
 };
 
 jsi::Value createCredentialRequest(jsi::Runtime &rt, jsi::Object options) {
-  auto proverDid = jsiToValue<FfiStr>(rt, options, "proverDid");
+  auto proverDid = jsiToValue<std::string>(rt, options, "proverDid");
   auto credDef = jsiToValue<ObjectHandle>(rt, options, "credDef");
   auto masterSecret = jsiToValue<ObjectHandle>(rt, options, "masterSecret");
-  auto masterSecretId = jsiToValue<FfiStr>(rt, options, "masterSecretId");
+  auto masterSecretId = jsiToValue<std::string>(rt, options, "masterSecretId");
   auto credOffer = jsiToValue<ObjectHandle>(rt, options, "credOffer");
 
-  Objecthandle credReqP;
-  Objecthandle credReqMetaP;
+  ObjectHandle *credReqP;
+  ObjectHandle *credReqMetaP;
 
   ErrorCode code = credx_create_credential_request(
-      proverDid, credDef, masterSecret, masterSecretId, credOffer, credReqP,
-      credReqMetaP);
+      proverDid.c_str(), credDef, masterSecret, masterSecretId.c_str(),
+      credOffer, credReqP, credReqMetaP);
   handleError(rt, code);
 
   jsi::Object object = jsi::Object(rt);
-  object.setProperty(rt, "credReq", credReqP);
-  object.setProperty(rt, "credReqMeta", credReqMetaP);
+  object.setProperty(rt, "credReq", int(*credReqP));
+  object.setProperty(rt, "credReqMeta", int(*credReqMetaP));
   return object;
 };
 
 jsi::Value createMasterSecret(jsi::Runtime &rt, jsi::Object options) {
-  ObjectHandle masterSecretP;
+  ObjectHandle *masterSecretP;
 
-  ErrorCode code = crex_create_master_secret(masterSecretP);
+  ErrorCode code = credx_create_master_secret(masterSecretP);
   handleError(rt, code);
 
-  return jsi::Value(masterSecretP);
+  return jsi::Value(int(*masterSecretP));
 };
 
 jsi::Value createOrUpdateRevocationState(jsi::Runtime &rt,
                                          jsi::Object options) {
   auto revRegDef = jsiToValue<ObjectHandle>(rt, options, "revRegDef");
   auto revRegDelta = jsiToValue<ObjectHandle>(rt, options, "revRegDelta");
+  auto revRegIndex = jsiToValue<int64_t>(rt, options, "revRegIndex");
   auto timestamp = jsiToValue<int64_t>(rt, options, "timestamp");
-  auto tailsPath = jsiToValue<FfiStr>(rt, options, "tailsPath");
+  auto tailsPath = jsiToValue<std::string>(rt, options, "tailsPath");
   auto revState = jsiToValue<ObjectHandle>(rt, options, "revState");
 
-  ObjectHandle revStateP;
+  ObjectHandle *revStateP;
 
   ErrorCode code = credx_create_or_update_revocation_state(
-      revRegDef, revRegDelta, timestamp, tailsPath, revState, revStateP);
+      revRegDef, revRegDelta, revRegIndex, timestamp, tailsPath.c_str(),
+      revState, revStateP);
   handleError(rt, code);
 
-  return jsi::Value(revStateP);
+  return jsi::Value(int(*revStateP));
 };
 
 jsi::Value createPresentation(jsi::Runtime &rt, jsi::Object options) {
@@ -141,82 +135,85 @@ jsi::Value createPresentation(jsi::Runtime &rt, jsi::Object options) {
   auto schemas = jsiToValue<FfiList_ObjectHandle>(rt, options, "schemas");
   auto credDefs = jsiToValue<FfiList_ObjectHandle>(rt, options, "credDefs");
 
-  ObjectHandle presentationP;
+  ObjectHandle *presentationP;
 
   ErrorCode code = credx_create_presentation(
       presReq, credentials, credentialsProve, selfAttestNames, selfAttestValues,
-      schemas, credDefs, presentationP);
+      masterSecret, schemas, credDefs, presentationP);
 
-  return jsi::Value(presentationP);
+  return jsi::Value(int(*presentationP));
 };
 
 jsi::Value createRevocationRegistry(jsi::Runtime &rt, jsi::Object options) {
-  auto originDid = jsiToValue<FfiStr>(rt, options, "originDid");
+  auto originDid = jsiToValue<std::string>(rt, options, "originDid");
   auto credDef = jsiToValue<ObjectHandle>(rt, options, "credDef");
-  auto tag = jsiToValue<FfiStr>(rt, options, "tag");
-  auto revRegType = jsiToValue<FfiStr>(rt, options, "revRegType");
-  auto issuanceType = jsiToValue<FfiStr>(rt, options, "issuanceType");
+  auto tag = jsiToValue<std::string>(rt, options, "tag");
+  auto revRegType = jsiToValue<std::string>(rt, options, "revRegType");
+  auto issuanceType = jsiToValue<std::string>(rt, options, "issuanceType");
   auto maxCredNum = jsiToValue<int64_t>(rt, options, "maxCredNum");
-  auto tailsDirPath = jsiToValue<FfiStr>(rt, options, "tailsDirPath");
+  auto tailsDirPath = jsiToValue<std::string>(rt, options, "tailsDirPath");
 
-  ObjectHandle regDefP;
-  ObjechHandle regDefPrivateP;
-  ObjectHandle regEntryP;
-  ObjectHandle regInitDeltaP;
+  ObjectHandle *regDefP;
+  ObjectHandle *regDefPrivateP;
+  ObjectHandle *regEntryP;
+  ObjectHandle *regInitDeltaP;
 
-  ErorCode code = credx_create_revocation_registry(
-      originDid, credDef, tag, revRegType, issuanceType, maxCredNum,
-      tailsDirPath, regDefP, regDefPrivateP, regEntryP, regInitDeltaP);
+  ErrorCode code = credx_create_revocation_registry(
+      originDid.c_str(), credDef, tag.c_str(), revRegType.c_str(),
+      issuanceType.c_str(), maxCredNum, tailsDirPath.c_str(), regDefP,
+      regDefPrivateP, regEntryP, regInitDeltaP);
   handleError(rt, code);
 
   jsi::Object object = jsi::Object(rt);
-  object.setProperty(rt, "regDef", regDefP);
-  object.setProperty(rt, "regDefPrivate", regDefPrivateP);
-  object.setProperty(rt, "regEntry", regEntryP);
-  object.setProperty(rt, "regInitDelta", regInitDeltaP);
+  object.setProperty(rt, "regDef", int(*regDefP));
+  object.setProperty(rt, "regDefPrivate", int(*regDefPrivateP));
+  object.setProperty(rt, "regEntry", int(*regEntryP));
+  object.setProperty(rt, "regInitDelta", int(*regInitDeltaP));
   return object;
 };
 
 jsi::Value createSchema(jsi::Runtime &rt, jsi::Object options) {
-  auto originDid = jsiToValue<FfiStr>(rt, options, "originDid");
-  auto schemaName = jsiToValue<FfiStr>(rt, options, "schemaName");
-  auto schemaVersion = jsiToValue<FfiStr>(rt, options, "schemaVersion");
+  auto originDid = jsiToValue<std::string>(rt, options, "originDid");
+  auto schemaName = jsiToValue<std::string>(rt, options, "schemaName");
+  auto schemaVersion = jsiToValue<std::string>(rt, options, "schemaVersion");
   auto attrNames = jsiToValue<FfiStrList>(rt, options, "attrNames");
   auto seqNo = jsiToValue<int64_t>(rt, options, "seqNo");
 
-  ObjectHandle resultP;
+  ObjectHandle *resultP;
 
-  ErrorCode code = credx_create_schema(originDid, schemaName, schemaVersion,
-                                       attrNames, seqNo, resultP);
+  ErrorCode code =
+      credx_create_schema(originDid.c_str(), schemaName.c_str(),
+                          schemaVersion.c_str(), attrNames, seqNo, resultP);
   handleError(rt, code);
 
-  return jsi::Value(resultP);
+  return jsi::Value(int(*resultP));
 };
 
 jsi::Value credentialDefinitionGetAttribute(jsi::Runtime &rt,
                                             jsi::Object options) {
   auto handle = jsiToValue<ObjectHandle>(rt, options, "handle");
-  auto name = jsiToValue<FfiStr>(rt, options, "name");
+  auto name = jsiToValue<std::string>(rt, options, "name");
 
   const char **resultP;
 
   ErrorCode code =
-      credx_credential_definition_get_attribute(handle, name, resultP);
+      credx_credential_definition_get_attribute(handle, name.c_str(), resultP);
   handleError(rt, code);
 
-  return jsi::String::createFromAscii(rt, resultP);
+  return jsi::String::createFromAscii(rt, "TODO");
 };
 
 jsi::Value credentialGetAttribute(jsi::Runtime &rt, jsi::Object options) {
   auto handle = jsiToValue<ObjectHandle>(rt, options, "handle");
-  auto name = jsiToValue<FfiStr>(rt, options, "name");
+  auto name = jsiToValue<std::string>(rt, options, "name");
 
   const char **resultP;
 
-  ErrorCode code = credx_credential_get_attribute(handle, name, resultP);
+  ErrorCode code =
+      credx_credential_get_attribute(handle, name.c_str(), resultP);
   handleError(rt, code);
 
-  return jsi::String::createFromAscii(rt, resultP);
+  return jsi::String::createFromAscii(rt, "TODO");
 };
 
 jsi::Value encodeCredentialAttributes(jsi::Runtime &rt, jsi::Object options) {
@@ -227,25 +224,25 @@ jsi::Value encodeCredentialAttributes(jsi::Runtime &rt, jsi::Object options) {
   ErrorCode code = credx_encode_credential_attributes(attrRawValues, resultP);
   handleError(rt, code);
 
-  return jsi::String::createFromAscii(rt, resultP);
+  return jsi::String::createFromAscii(rt, "TODO");
 };
 
 jsi::Value generateNonce(jsi::Runtime &rt, jsi::Object options) {
   const char **nonceP;
 
   ErrorCode code = credx_generate_nonce(nonceP);
-  handleError(rt code);
+  handleError(rt, code);
 
-  return jsi::String::createFromAscii(rt, nonceP);
+  return jsi::String::createFromAscii(rt, "TODO");
 };
 
 jsi::Value getCurrentError(jsi::Runtime &rt, jsi::Object options) {
   const char **errorJsonP;
 
   ErrorCode code = credx_get_current_error(errorJsonP);
-  handleError(rt code);
+  handleError(rt, code);
 
-  return jsi::String::createFromAscii(rt, errorJsonP);
+  return jsi::String::createFromAscii(rt, *errorJsonP);
 };
 
 jsi::Value mergeRevocationRegistryDeltas(jsi::Runtime &rt,
@@ -253,24 +250,25 @@ jsi::Value mergeRevocationRegistryDeltas(jsi::Runtime &rt,
   auto revRegDelta1 = jsiToValue<ObjectHandle>(rt, options, "revRegDelta1");
   auto revRegDelta2 = jsiToValue<ObjectHandle>(rt, options, "revRegDelta2");
 
-  ObjectHandle revRegDeltaP;
+  ObjectHandle *revRegDeltaP;
 
   ErrorCode code = credx_merge_revocation_registry_deltas(
       revRegDelta1, revRegDelta2, revRegDeltaP);
   handleError(rt, code);
 
-  return jsi::Value(revRegDeltaP);
+  return jsi::Value(int(*revRegDeltaP));
 };
 
 jsi::Value objectGetJson(jsi::Runtime &rt, jsi::Object options) {
   auto handle = jsiToValue<ObjectHandle>(rt, options, "handle");
 
-  ByteBuffer resultP;
+  ByteBuffer *resultP;
 
   ErrorCode code = credx_object_get_json(handle, resultP);
   handleError(rt, code);
 
-  return jsi::Value(resultP);
+  // TODO: ByteBuffer to string
+  return jsi::Value(0);
 };
 
 jsi::Value objectGetTypeName(jsi::Runtime &rt, jsi::Object options) {
@@ -281,7 +279,7 @@ jsi::Value objectGetTypeName(jsi::Runtime &rt, jsi::Object options) {
   ErrorCode code = credx_object_get_type_name(handle, resultP);
   handleError(rt, code);
 
-  return jsi::String::createFromAscii(rt, errorJsonP);
+  return jsi::String::createFromAscii(rt, *resultP);
 };
 
 jsi::Value processCredential(jsi::Runtime &rt, jsi::Object options) {
@@ -298,52 +296,52 @@ jsi::Value processCredential(jsi::Runtime &rt, jsi::Object options) {
                                             credDef, revRegDef, credP);
   handleError(rt, code);
 
-  return jsi::Value(credP);
+  return jsi::Value(int(*credP));
 };
 
 jsi::Value revocationRegistryDefinitionGetAttribute(jsi::Runtime &rt,
                                                     jsi::Object options) {
   auto handle = jsiToValue<ObjectHandle>(rt, options, "handle");
-  auto name = jsiToValue<FfiStr>(rt, options, "name");
+  auto name = jsiToValue<std::string>(rt, options, "name");
 
   const char **resultP;
 
   ErrorCode code =
-      credx_revocation_registry_definition_get_attrbute(handle, name, resultP);
+      credx_revocation_registry_definition_get_attribute(handle, name.c_str(), resultP);
   handleError(rt, code);
 
-  return jsi::String::createFromAscii(rt, resultP);
+  return jsi::String::createFromAscii(rt, *resultP);
 };
 
 jsi::Value revokeCredential(jsi::Runtime &rt, jsi::Object options) {
   auto revRegDef = jsiToValue<ObjectHandle>(rt, options, "revRegDef");
   auto revReg = jsiToValue<ObjectHandle>(rt, options, "revReg");
   auto credRevIdx = jsiToValue<int64_t>(rt, options, "credRevIdx");
-  auto tailsPath = jsiToValue<FfiStr>(rt, options, "tailsPath");
+  auto tailsPath = jsiToValue<std::string>(rt, options, "tailsPath");
 
   ObjectHandle *revRegP;
   ObjectHandle *revRegDeltaP;
 
   ErrorCode code = credx_revoke_credential(revRegDef, revReg, credRevIdx,
-                                           tailsPath, revRegP, revRegDeltaP);
+                                           tailsPath.c_str(), revRegP, revRegDeltaP);
   handleError(rt, code);
 
   jsi::Object object = jsi::Object(rt);
-  object.setProperty(rt, "revReg", revRegP);
-  object.setProperty(rt, "revRegDelta", revRegDeltaP);
+  object.setProperty(rt, "revReg", int(*revRegP));
+  object.setProperty(rt, "revRegDelta", int(*revRegDeltaP));
   return object;
 };
 
 jsi::Value schemaGetAttribute(jsi::Runtime &rt, jsi::Object options) {
   auto handle = jsiToValue<ObjectHandle>(rt, options, "handle");
-  auto name = jsiToValue<FfiStr>(rt, options, "name");
+  auto name = jsiToValue<std::string>(rt, options, "name");
 
   const char **resultP;
 
-  ErrorCode code = credx_schema_get_attribute(handle, name, resultP);
+  ErrorCode code = credx_schema_get_attribute(handle, name.c_str(), resultP);
   handleError(rt, code);
 
-  return jsi::String::createFromAscii(rt, resultP);
+  return jsi::String::createFromAscii(rt, *resultP);
 };
 
 jsi::Value setDefaultLogger(jsi::Runtime &rt, jsi::Object options) {
@@ -354,19 +352,20 @@ jsi::Value setDefaultLogger(jsi::Runtime &rt, jsi::Object options) {
 jsi::Value updateRevocationRegistry(jsi::Runtime &rt, jsi::Object options) {
   auto revRegDef = jsiToValue<ObjectHandle>(rt, options, "revRegDef");
   auto revReg = jsiToValue<ObjectHandle>(rt, options, "revReg");
-  auto issued = jsiToValue<FfiList_i64>(rt, options, "revoked");
-  auto tailsPath = jsiToValue<FfiStr>(rt, options, "tailsPath");
+  auto issued = jsiToValue<FfiList_i64>(rt, options, "issued");
+  auto revoked = jsiToValue<FfiList_i64>(rt, options, "revoked");
+  auto tailsPath = jsiToValue<std::string>(rt, options, "tailsPath");
 
-  ObjectHanlde *revRegP;
-  ObjectHanlde *revRegDeltaP;
+  ObjectHandle *revRegP;
+  ObjectHandle *revRegDeltaP;
 
   ErrorCode code = credx_update_revocation_registry(
-      revRegDef, revReg, issued, tailsPath, revRegP, revRegDeltaP);
+      revRegDef, revReg, issued, revoked, tailsPath.c_str(), revRegP, revRegDeltaP);
   handleError(rt, code);
 
   jsi::Object object = jsi::Object(rt);
-  object.setProperty(rt, "revReg", revRegP);
-  object.setProperty(rt, "revRegDelta", revRegDeltaP);
+  object.setProperty(rt, "revReg", int(*revRegP));
+  object.setProperty(rt, "revRegDelta", int(*revRegDeltaP));
   return object;
 }
 
@@ -386,7 +385,7 @@ jsi::Value verifyPresentation(jsi::Runtime &rt, jsi::Object options) {
                                 revRegDefs, revRegEntries, resultP);
   handleError(rt, code);
 
-  return jsi::Value(resultP);
+  return jsi::Value(int(*resultP));
 };
 
 jsi::Value objectFree(jsi::Runtime &rt, jsi::Object options) {

@@ -8,7 +8,6 @@ FunctionMap TurboModuleHostObject::functionMapping(jsi::Runtime &rt) {
   FunctionMap fMap;
 
   fMap.insert(std::make_tuple("version", &indyCredx::version));
-  fMap.insert(std::make_tuple("bufferFree", &indyCredx::bufferFree));
   fMap.insert(
       std::make_tuple("createCredential", &indyCredx::createCredential));
   fMap.insert(std::make_tuple("createCredentialDefinition",

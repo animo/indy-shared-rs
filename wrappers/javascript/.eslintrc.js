@@ -10,7 +10,7 @@ module.exports = {
   ],
   parserOptions: {
     tsconfigRootDir: __dirname,
-    project: ['tsconfig.eslint.json', 'shared/tsconfig.json', 'nodejs/tsconfig.json', 'react-native/tsconfig.json'],
+    project: ['tsconfig.eslint.json', './**/tsconfig.json'],
   },
   settings: {
     'import/extensions': ['.js', '.ts', '.jsx', '.tsx'],
@@ -29,6 +29,7 @@ module.exports = {
       },
     },
   },
+  ignorePatterns: ['**/build/**'],
   rules: {
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
@@ -64,6 +65,26 @@ module.exports = {
       },
       rules: {
         '@typescript-eslint/no-var-requires': 'off',
+      },
+    },
+    {
+      files: ['*.test.ts'],
+      env: {
+        jest: true,
+        node: false,
+      },
+      rules: {
+        '@typescript-eslint/no-unsafe-call': 'off',
+        '@typescript-eslint/no-unsafe-assignment': 'off',
+        '@typescript-eslint/no-unsafe-member-access': 'off',
+        '@typescript-eslint/unbound-method': 'off',
+        '@typescript-eslint/restrict-template-expressions': 'off',
+        'import/no-extraneous-dependencies': [
+          'error',
+          {
+            devDependencies: true,
+          },
+        ],
       },
     },
   ],

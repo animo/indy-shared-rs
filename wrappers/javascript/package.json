@@ -3,21 +3,7 @@
   "private": true,
   "license": "Apache-2.0",
   "workspaces": {
-    "packages": [
-      "shared",
-      "nodejs",
-      "react-native"
-    ],
-    "nohoist": [
-      "**/react-native/**",
-      "react-native/**",
-      "react-native",
-      "**/react-native",
-      "**/react/**",
-      "react/**",
-      "react",
-      "**/react"
-    ]
+    "packages": ["shared", "nodejs", "react-native", "react-native-example"]
   },
   "scripts": {
     "lint": "eslint .",
@@ -44,9 +30,9 @@
     "@types/jest": "28.1.6",
     "@typescript-eslint/eslint-plugin": "5.11.0",
     "@typescript-eslint/parser": "5.11.0",
-    "eslint": "8.8.0",
+    "eslint": "8.22.0",
     "eslint-config-prettier": "8.3.0",
-    "eslint-import-resolver-typescript": "2.5.0",
+    "eslint-import-resolver-typescript": "3.5.0",
     "eslint-plugin-import": "2.25.4",
     "eslint-plugin-prettier": "4.0.0",
     "jest": "28.1.3",

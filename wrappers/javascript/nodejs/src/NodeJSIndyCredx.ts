@@ -96,12 +96,12 @@ export class NodeJSIndyCredx implements IndyCredx {
     tag: string
     signatureType: string
     supportRevocation: boolean
-  }): [ObjectHandle, ObjectHandle, ObjectHandle] {
+  }): { credentialDefinition: ObjectHandle; credentialDefinitionPrivate: ObjectHandle; keyProof: ObjectHandle } {
     const { originDid, schema, tag, signatureType, supportRevocation } = serializeArguments(options)
 
-    const ret1 = allocatePointer()
-    const ret2 = allocatePointer()
-    const ret3 = allocatePointer()
+    const credentialDefinitionPtr = allocatePointer()
+    const credentialDefinitionPrivatePtr = allocatePointer()
+    const keyProofPtr = allocatePointer()
 
     nativeIndyCredx.credx_create_credential_definition(
       originDid,
@@ -109,17 +109,17 @@ export class NodeJSIndyCredx implements IndyCredx {
       tag,
       signatureType,
       supportRevocation,
-      ret1,
-      ret2,
-      ret3
+      credentialDefinitionPtr,
+      credentialDefinitionPrivatePtr,
+      keyProofPtr
     )
     handleError()
 
-    return [
-      new ObjectHandle(ret1.deref() as number),
-      new ObjectHandle(ret2.deref() as number),
-      new ObjectHandle(ret3.deref() as number),
-    ]
+    return {
+      credentialDefinition: new ObjectHandle(credentialDefinitionPtr.deref() as number),
+      credentialDefinitionPrivate: new ObjectHandle(credentialDefinitionPrivatePtr.deref() as number),
+      keyProof: new ObjectHandle(keyProofPtr.deref() as number),
+    }
   }
 
   public credentialDefinitionGetAttribute(options: { objectHandle: ObjectHandle; name: string }): string {
@@ -140,7 +140,7 @@ export class NodeJSIndyCredx implements IndyCredx {
     attributeRawValues: Record<string, string>
     attributeEncodedValues?: Record<string, string> | undefined
     revocationConfiguration?: NativeCredentialRevocationConfig | undefined
-  }): [ObjectHandle, ObjectHandle, ObjectHandle] {
+  }): { credential: ObjectHandle; revocationRegistry: ObjectHandle; revocationDelta: ObjectHandle } {
     const { credentialDefinition, credentialDefinitionPrivate, credentialOffer, credentialRequest } =
       serializeArguments(options)
 
@@ -190,9 +190,9 @@ export class NodeJSIndyCredx implements IndyCredx {
         tails_path: tailsPath,
       })
     }
-    const ret1 = allocatePointer()
-    const ret2 = allocatePointer()
-    const ret3 = allocatePointer()
+    const credentialPtr = allocatePointer()
+    const revocationRegistryPtr = allocatePointer()
+    const revocationDeltaPtr = allocatePointer()
 
     nativeIndyCredx.credx_create_credential(
       credentialDefinition,
@@ -204,18 +204,19 @@ export class NodeJSIndyCredx implements IndyCredx {
       attributeRawValues,
       attributeEncodedValues,
       revocationConfiguration.ref(),
-      ret1,
-      ret2,
-      ret3
+      credentialPtr,
+      revocationRegistryPtr,
+      revocationDeltaPtr
     )
     handleError()
 
-    return [
-      new ObjectHandle(ret1.deref() as number),
-      new ObjectHandle(ret1.deref() as number),
-      new ObjectHandle(ret1.deref() as number),
-    ]
+    return {
+      credential: new ObjectHandle(credentialPtr.deref() as number),
+      revocationDelta: new ObjectHandle(revocationDeltaPtr.deref() as number),
+      revocationRegistry: new ObjectHandle(revocationRegistryPtr.deref() as number),
+    }
   }
+
   public encodeCredentialAttributes(attributeRawValues: Record<string, string>): Record<string, string> {
     const rawValues = StringListStruct({
       count: Object.keys(attributeRawValues).length,
@@ -269,24 +270,27 @@ export class NodeJSIndyCredx implements IndyCredx {
     revocationRegistry: ObjectHandle
     credentialRevocationIndex: number
     tailsPath: string
-  }): [ObjectHandle, ObjectHandle] {
+  }): { revocationRegistry: ObjectHandle; revocationRegistryDelta: ObjectHandle } {
     const { revocationRegistryDefinition, revocationRegistry, credentialRevocationIndex, tailsPath } =
       serializeArguments(options)
 
-    const ret1 = allocatePointer()
-    const ret2 = allocatePointer()
+    const revocationRegistryPtr = allocatePointer()
+    const revocationRegistryDeltaPtr = allocatePointer()
 
     nativeIndyCredx.credx_revoke_credential(
       revocationRegistryDefinition,
       revocationRegistry,
       credentialRevocationIndex,
       tailsPath,
-      ret1,
-      ret2
+      revocationRegistryPtr,
+      revocationRegistryDeltaPtr
     )
     handleError()
 
-    return [new ObjectHandle(ret1.deref() as number), new ObjectHandle(ret2.deref() as number)]
+    return {
+      revocationRegistry: new ObjectHandle(revocationRegistryPtr.deref() as number),
+      revocationRegistryDelta: new ObjectHandle(revocationRegistryDeltaPtr.deref() as number),
+    }
   }
 
   public createCredentialOffer(options: {
@@ -309,12 +313,12 @@ export class NodeJSIndyCredx implements IndyCredx {
     masterSecret: ObjectHandle
     masterSecretId: string
     credentialOffer: ObjectHandle
-  }): [ObjectHandle, ObjectHandle] {
+  }): { credentialRequest: ObjectHandle; credentialRequestMeta: ObjectHandle } {
     const { proverDid, credentialDefinition, masterSecret, masterSecretId, credentialOffer } =
       serializeArguments(options)
 
-    const ret1 = allocatePointer()
-    const ret2 = allocatePointer()
+    const credentialRequestPtr = allocatePointer()
+    const credentialRequestMetaPtr = allocatePointer()
 
     nativeIndyCredx.credx_create_credential_request(
       proverDid,
@@ -322,12 +326,15 @@ export class NodeJSIndyCredx implements IndyCredx {
       masterSecret,
       masterSecretId,
       credentialOffer,
-      ret1,
-      ret2
+      credentialRequestPtr,
+      credentialRequestMetaPtr
     )
     handleError()
 
-    return [new ObjectHandle(ret1.deref() as number), new ObjectHandle(ret2.deref() as number)]
+    return {
+      credentialRequest: new ObjectHandle(credentialRequestPtr.deref() as number),
+      credentialRequestMeta: new ObjectHandle(credentialRequestMetaPtr.deref() as number),
+    }
   }
 
   public createMasterSecret(): ObjectHandle {
@@ -455,7 +462,12 @@ export class NodeJSIndyCredx implements IndyCredx {
     issuanceType?: string | undefined
     maximumCredentialNumber: number
     tailsDirectoryPath?: string | undefined
-  }): [ObjectHandle, ObjectHandle, ObjectHandle, ObjectHandle] {
+  }): {
+    registryDefinition: ObjectHandle
+    registryDefinitionPrivate: ObjectHandle
+    registryEntry: ObjectHandle
+    registryInitDelta: ObjectHandle
+  } {
     const {
       originDid,
       credentialDefinition,
@@ -466,10 +478,10 @@ export class NodeJSIndyCredx implements IndyCredx {
       tailsDirectoryPath,
     } = serializeArguments(options)
 
-    const ret1 = allocatePointer()
-    const ret2 = allocatePointer()
-    const ret3 = allocatePointer()
-    const ret4 = allocatePointer()
+    const registryDefinitionPtr = allocatePointer()
+    const registryDefinitionPrivate = allocatePointer()
+    const registryEntryPtr = allocatePointer()
+    const registryInitDeltaPtr = allocatePointer()
 
     nativeIndyCredx.credx_create_revocation_registry(
       originDid,
@@ -479,32 +491,33 @@ export class NodeJSIndyCredx implements IndyCredx {
       issuanceType,
       maximumCredentialNumber,
       tailsDirectoryPath,
-      ret1,
-      ret2,
-      ret3,
-      ret4
+      registryDefinitionPtr,
+      registryDefinitionPrivate,
+      registryEntryPtr,
+      registryInitDeltaPtr
     )
     handleError()
 
-    return [
-      new ObjectHandle(ret1.deref() as number),
-      new ObjectHandle(ret2.deref() as number),
-      new ObjectHandle(ret3.deref() as number),
-      new ObjectHandle(ret4.deref() as number),
-    ]
+    return {
+      registryDefinition: new ObjectHandle(registryDefinitionPtr.deref() as number),
+      registryDefinitionPrivate: new ObjectHandle(registryDefinitionPrivate.deref() as number),
+      registryEntry: new ObjectHandle(registryEntryPtr.deref() as number),
+      registryInitDelta: new ObjectHandle(registryInitDeltaPtr.deref() as number),
+    }
   }
+
   public updateRevocationRegistry(options: {
     revocationRegistryDefinition: ObjectHandle
     revocationRegistry: ObjectHandle
     issued: number[]
     revoked: number[]
     tailsDirectoryPath: string
-  }): [ObjectHandle, ObjectHandle] {
+  }): { revocationRegistry: ObjectHandle; revocationRegistryDelta: ObjectHandle } {
     const { revocationRegistryDefinition, revocationRegistry, tailsDirectoryPath, issued, revoked } =
       serializeArguments(options)
 
-    const ret1 = allocatePointer()
-    const ret2 = allocatePointer()
+    const revocationRegistryPtr = allocatePointer()
+    const revocationRegistryDelta = allocatePointer()
 
     nativeIndyCredx.credx_update_revocation_registry(
       revocationRegistryDefinition,
@@ -513,12 +526,15 @@ export class NodeJSIndyCredx implements IndyCredx {
       issued,
       revoked,
       tailsDirectoryPath,
-      ret1,
-      ret2
+      revocationRegistryPtr,
+      revocationRegistryDelta
     )
     handleError()
 
-    return [new ObjectHandle(ret1.deref() as number), new ObjectHandle(ret2.deref() as number)]
+    return {
+      revocationRegistry: new ObjectHandle(revocationRegistryPtr.deref() as number),
+      revocationRegistryDelta: new ObjectHandle(revocationRegistryDelta.deref() as number),
+    }
   }
   public mergeRevocationRegistryDeltas(options: {
     revocationRegistryDelta1: ObjectHandle
@@ -658,7 +674,7 @@ export class NodeJSIndyCredx implements IndyCredx {
     nativeIndyCredx.credx_object_get_json(objectHandle, ret)
     handleError()
 
-    const output = new Uint8Array(byteBufferToBuffer(ret.deref()))
+    const output = new Uint8Array(byteBufferToBuffer(ret.deref() as { data: Buffer; len: number }))
 
     return new TextDecoder().decode(output)
   }

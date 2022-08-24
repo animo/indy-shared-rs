@@ -9,7 +9,7 @@
 using namespace facebook;
 
 namespace turboModuleUtility {
-
+static const int32_t arrayMaxSize = 255;
 static const std::string errorPrefix = "Value `";
 static const std::string errorInfix = "` is not of type ";
 

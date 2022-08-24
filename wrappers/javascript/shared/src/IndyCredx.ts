@@ -52,7 +52,7 @@ export interface IndyCredx {
     tag: string
     signatureType: string
     supportRevocation: boolean
-  }): [ObjectHandle, ObjectHandle, ObjectHandle]
+  }): { credentialDefinition: ObjectHandle; credentialDefinitionPrivate: ObjectHandle; keyProof: ObjectHandle }
 
   createCredential(options: {
     credentialDefinition: ObjectHandle
@@ -62,7 +62,7 @@ export interface IndyCredx {
     attributeRawValues: Record<string, string>
     attributeEncodedValues?: Record<string, string>
     revocationConfiguration?: NativeCredentialRevocationConfig
-  }): [ObjectHandle, ObjectHandle, ObjectHandle]
+  }): { credential: ObjectHandle; revocationRegistry: ObjectHandle; revocationDelta: ObjectHandle }
 
   encodeCredentialAttributes(attributeRawValues: Record<string, string>): Record<string, string>
 
@@ -79,7 +79,7 @@ export interface IndyCredx {
     revocationRegistry: ObjectHandle
     credentialRevocationIndex: number
     tailsPath: string
-  }): [ObjectHandle, ObjectHandle]
+  }): { revocationRegistry: ObjectHandle; revocationRegistryDelta: ObjectHandle }
 
   createCredentialOffer(options: {
     schemaId: string
@@ -93,7 +93,7 @@ export interface IndyCredx {
     masterSecret: ObjectHandle
     masterSecretId: string
     credentialOffer: ObjectHandle
-  }): [ObjectHandle, ObjectHandle]
+  }): { credentialRequest: ObjectHandle; credentialRequestMeta: ObjectHandle }
 
   createMasterSecret(): ObjectHandle
 
@@ -124,7 +124,12 @@ export interface IndyCredx {
     issuanceType?: string
     maximumCredentialNumber: number
     tailsDirectoryPath?: string
-  }): [ObjectHandle, ObjectHandle, ObjectHandle, ObjectHandle]
+  }): {
+    registryDefinition: ObjectHandle
+    registryDefinitionPrivate: ObjectHandle
+    registryEntry: ObjectHandle
+    registryInitDelta: ObjectHandle
+  }
 
   updateRevocationRegistry(options: {
     revocationRegistryDefinition: ObjectHandle
@@ -132,7 +137,7 @@ export interface IndyCredx {
     issued: number[]
     revoked: number[]
     tailsDirectoryPath: string
-  }): [ObjectHandle, ObjectHandle]
+  }): { revocationRegistry: ObjectHandle; revocationRegistryDelta: ObjectHandle }
 
   mergeRevocationRegistryDeltas(options: {
     revocationRegistryDelta1: ObjectHandle
