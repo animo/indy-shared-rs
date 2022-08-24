@@ -5,8 +5,8 @@ import type { ObjectHandle } from './ObjectHandle'
 
 export type NativeCredentialEntry = {
   credential: ObjectHandle
-  timestamp: number
-  revocationState: ObjectHandle
+  timestamp?: number
+  revocationState?: ObjectHandle
 }
 
 export type NativeCredentialProve = {
@@ -112,8 +112,8 @@ export interface IndyCredx {
     presentationRequest: ObjectHandle
     schemas: ObjectHandle[]
     credentialDefinitions: ObjectHandle[]
-    revocationRegistryDefinitions: ObjectHandle[]
-    revocationEntries: NativeRevocationEntry[]
+    revocationRegistryDefinitions?: ObjectHandle[]
+    revocationEntries?: NativeRevocationEntry[]
   }): boolean
 
   createRevocationRegistry(options: {

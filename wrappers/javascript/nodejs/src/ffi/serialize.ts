@@ -62,7 +62,7 @@ const serialize = (arg: Argument): SerializedArgument => {
     case 'undefined':
       return NULL
     case 'boolean':
-      return +arg
+      return Number(arg)
     case 'string':
       return arg
     case 'number':
