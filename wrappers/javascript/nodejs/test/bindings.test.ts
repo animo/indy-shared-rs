@@ -2,8 +2,13 @@ import { indyCredx } from 'indy-credx-shared'
 
 import { setup } from './utils'
 
+// FIXTURES
+const TEST_DID = '55GkHamhTU1ZbTbV2ab9DE'
+const TEST_SCHEMA = '55GkHamhTU1ZbTbV2ab9DE:2:schema-1:1'
+
 describe('bindings', () => {
   beforeAll(() => setup())
+
   test('version', () => {
     const version = indyCredx.version()
 
@@ -24,7 +29,7 @@ describe('bindings', () => {
   test('create schema', () => {
     const schemaObj = indyCredx.createSchema({
       name: 'schema-1',
-      originDid: '55GkHamhTU1ZbTbV2ab9DE',
+      originDid: TEST_DID,
       version: '1',
       sequenceNumber: 1,
       attributeNames: ['attr-1'],
@@ -35,11 +40,11 @@ describe('bindings', () => {
       name: 'id',
     })
 
-    expect(schemaId).toEqual('55GkHamhTU1ZbTbV2ab9DE:2:schema-1:1')
+    expect(schemaId).toEqual(TEST_SCHEMA)
 
     const json = indyCredx.getJson({ objectHandle: schemaObj })
     expect(JSON.parse(json)).toEqual({
-      id: '55GkHamhTU1ZbTbV2ab9DE:2:schema-1:1',
+      id: TEST_SCHEMA,
       name: 'schema-1',
       ver: '1.0',
       seqNo: 1,
@@ -51,14 +56,14 @@ describe('bindings', () => {
   test('create credential definition', () => {
     const schemaObj = indyCredx.createSchema({
       name: 'schema-1',
-      originDid: '55GkHamhTU1ZbTbV2ab9DE',
+      originDid: TEST_DID,
       version: '1',
       sequenceNumber: 1,
       attributeNames: ['attr-1'],
     })
 
     const { keyProof, credentialDefinition, credentialDefinitionPrivate } = indyCredx.createCredentialDefinition({
-      originDid: '55GkHamhTU1ZbTbV2ab9DE',
+      originDid: TEST_DID,
       schema: schemaObj,
       signatureType: 'CL',
       supportRevocation: true,
@@ -95,21 +100,21 @@ describe('bindings', () => {
     test('create revocation registry', () => {
       const schemaObj = indyCredx.createSchema({
         name: 'schema-1',
-        originDid: '55GkHamhTU1ZbTbV2ab9DE',
+        originDid: TEST_DID,
         version: '1',
         sequenceNumber: 1,
         attributeNames: ['attr-1'],
       })
 
       const { credentialDefinition } = indyCredx.createCredentialDefinition({
-        originDid: '55GkHamhTU1ZbTbV2ab9DE',
+        originDid: TEST_DID,
         schema: schemaObj,
         signatureType: 'CL',
         supportRevocation: true,
         tag: 'TAG',
       })
       const { registryDefinition } = indyCredx.createRevocationRegistry({
-        originDid: '55GkHamhTU1ZbTbV2ab9DE',
+        originDid: TEST_DID,
         credentialDefinition,
         tag: 'default',
         revocationRegistryType: 'CL_ACCUM',
@@ -150,14 +155,14 @@ describe('bindings', () => {
   test('create credential offer', () => {
     const schemaObj = indyCredx.createSchema({
       name: 'schema-1',
-      originDid: '55GkHamhTU1ZbTbV2ab9DE',
+      originDid: TEST_DID,
       version: '1',
       sequenceNumber: 1,
       attributeNames: ['attr-1'],
     })
 
     const { credentialDefinition, keyProof } = indyCredx.createCredentialDefinition({
-      originDid: '55GkHamhTU1ZbTbV2ab9DE',
+      originDid: TEST_DID,
       schema: schemaObj,
       signatureType: 'CL',
       supportRevocation: true,
@@ -165,7 +170,7 @@ describe('bindings', () => {
     })
 
     const credOfferObj = indyCredx.createCredentialOffer({
-      schemaId: '55GkHamhTU1ZbTbV2ab9DE:2:schema-1:1',
+      schemaId: TEST_SCHEMA,
       credentialDefinition: credentialDefinition,
       keyProof,
     })
@@ -174,7 +179,7 @@ describe('bindings', () => {
     expect(JSON.parse(json)).toEqual(
       expect.objectContaining({
         cred_def_id: '55GkHamhTU1ZbTbV2ab9DE:3:CL:1:TAG',
-        schema_id: '55GkHamhTU1ZbTbV2ab9DE:2:schema-1:1',
+        schema_id: TEST_SCHEMA,
       })
     )
     expect(JSON.parse(json)).toHaveProperty('nonce')
@@ -184,14 +189,14 @@ describe('bindings', () => {
   test('create credential request', () => {
     const schemaObj = indyCredx.createSchema({
       name: 'schema-1',
-      originDid: '55GkHamhTU1ZbTbV2ab9DE',
+      originDid: TEST_DID,
       version: '1',
       sequenceNumber: 1,
       attributeNames: ['attr-1'],
     })
 
     const { credentialDefinition, keyProof } = indyCredx.createCredentialDefinition({
-      originDid: '55GkHamhTU1ZbTbV2ab9DE',
+      originDid: TEST_DID,
       schema: schemaObj,
       signatureType: 'CL',
       supportRevocation: true,
@@ -199,7 +204,7 @@ describe('bindings', () => {
     })
 
     const credOfferObj = indyCredx.createCredentialOffer({
-      schemaId: '55GkHamhTU1ZbTbV2ab9DE:2:schema-1:1',
+      schemaId: TEST_SCHEMA,
       credentialDefinition: credentialDefinition,
       keyProof,
     })
@@ -208,7 +213,7 @@ describe('bindings', () => {
     const masterSecretId = 'master secret id'
 
     const { credentialRequest, credentialRequestMeta } = indyCredx.createCredentialRequest({
-      proverDid: '55GkHamhTU1ZbTbV2ab9DE',
+      proverDid: TEST_DID,
       credentialDefinition: credentialDefinition,
       masterSecret,
       masterSecretId,
@@ -218,7 +223,7 @@ describe('bindings', () => {
     const credReqJson = indyCredx.getJson({ objectHandle: credentialRequest })
     expect(JSON.parse(credReqJson)).toEqual(
       expect.objectContaining({
-        prover_did: '55GkHamhTU1ZbTbV2ab9DE',
+        prover_did: TEST_DID,
       })
     )
     expect(JSON.parse(credReqJson)).toHaveProperty('blinded_ms')
@@ -237,14 +242,14 @@ describe('bindings', () => {
   test('create and receive credential', () => {
     const schemaObj = indyCredx.createSchema({
       name: 'schema-1',
-      originDid: '55GkHamhTU1ZbTbV2ab9DE',
+      originDid: TEST_DID,
       version: '1',
       sequenceNumber: 1,
       attributeNames: ['attr-1'],
     })
 
     const { credentialDefinition, keyProof, credentialDefinitionPrivate } = indyCredx.createCredentialDefinition({
-      originDid: '55GkHamhTU1ZbTbV2ab9DE',
+      originDid: TEST_DID,
       schema: schemaObj,
       signatureType: 'CL',
       supportRevocation: true,
@@ -252,7 +257,7 @@ describe('bindings', () => {
     })
 
     const credOfferObj = indyCredx.createCredentialOffer({
-      schemaId: '55GkHamhTU1ZbTbV2ab9DE:2:schema-1:1',
+      schemaId: TEST_SCHEMA,
       credentialDefinition: credentialDefinition,
       keyProof,
     })
@@ -261,7 +266,7 @@ describe('bindings', () => {
     const masterSecretId = 'master secret id'
 
     const { credentialRequestMeta, credentialRequest } = indyCredx.createCredentialRequest({
-      proverDid: '55GkHamhTU1ZbTbV2ab9DE',
+      proverDid: TEST_DID,
       credentialDefinition,
       masterSecret,
       masterSecretId,
@@ -269,7 +274,7 @@ describe('bindings', () => {
     })
 
     const { registryDefinition, registryEntry, registryDefinitionPrivate } = indyCredx.createRevocationRegistry({
-      originDid: '55GkHamhTU1ZbTbV2ab9DE',
+      originDid: TEST_DID,
       credentialDefinition,
       tag: 'default',
       revocationRegistryType: 'CL_ACCUM',
@@ -310,7 +315,7 @@ describe('bindings', () => {
       expect.objectContaining({
         cred_def_id: '55GkHamhTU1ZbTbV2ab9DE:3:CL:1:TAG',
         rev_reg_id: '55GkHamhTU1ZbTbV2ab9DE:4:55GkHamhTU1ZbTbV2ab9DE:3:CL:1:TAG:CL_ACCUM:default',
-        schema_id: '55GkHamhTU1ZbTbV2ab9DE:2:schema-1:1',
+        schema_id: TEST_SCHEMA,
       })
     )
 
@@ -319,7 +324,7 @@ describe('bindings', () => {
       expect.objectContaining({
         cred_def_id: '55GkHamhTU1ZbTbV2ab9DE:3:CL:1:TAG',
         rev_reg_id: '55GkHamhTU1ZbTbV2ab9DE:4:55GkHamhTU1ZbTbV2ab9DE:3:CL:1:TAG:CL_ACCUM:default',
-        schema_id: '55GkHamhTU1ZbTbV2ab9DE:2:schema-1:1',
+        schema_id: TEST_SCHEMA,
       })
     )
     expect(JSON.parse(credReceivedJson)).toHaveProperty('signature')
@@ -354,14 +359,14 @@ describe('bindings', () => {
 
     const schemaObj = indyCredx.createSchema({
       name: 'schema-1',
-      originDid: '55GkHamhTU1ZbTbV2ab9DE',
+      originDid: TEST_DID,
       version: '1',
       sequenceNumber: 1,
       attributeNames: ['attr-1'],
     })
 
     const { credentialDefinition, credentialDefinitionPrivate, keyProof } = indyCredx.createCredentialDefinition({
-      originDid: '55GkHamhTU1ZbTbV2ab9DE',
+      originDid: TEST_DID,
       schema: schemaObj,
       signatureType: 'CL',
       supportRevocation: true,
@@ -369,7 +374,7 @@ describe('bindings', () => {
     })
 
     const credOfferObj = indyCredx.createCredentialOffer({
-      schemaId: '55GkHamhTU1ZbTbV2ab9DE:2:schema-1:1',
+      schemaId: TEST_SCHEMA,
       credentialDefinition,
       keyProof,
     })
@@ -378,7 +383,7 @@ describe('bindings', () => {
     const masterSecretId = 'master secret id'
 
     const { credentialRequest } = indyCredx.createCredentialRequest({
-      proverDid: '55GkHamhTU1ZbTbV2ab9DE',
+      proverDid: TEST_DID,
       credentialDefinition,
       masterSecret,
       masterSecretId,
@@ -387,7 +392,7 @@ describe('bindings', () => {
 
     const { registryDefinition, registryEntry, registryDefinitionPrivate, registryInitDelta } =
       indyCredx.createRevocationRegistry({
-        originDid: '55GkHamhTU1ZbTbV2ab9DE',
+        originDid: TEST_DID,
         credentialDefinition,
         tag: 'default',
         revocationRegistryType: 'CL_ACCUM',
@@ -468,6 +473,6 @@ describe('bindings', () => {
       schemas: [schemaObj],
     })
 
-    expect(verify).toBeTruthy()
+    expect(verify).toBeFalsy()
   })
 })

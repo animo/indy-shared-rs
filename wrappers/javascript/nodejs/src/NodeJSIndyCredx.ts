@@ -427,13 +427,13 @@ export class NodeJSIndyCredx implements IndyCredx {
         ? RevocationEntryListStruct({
             count: options.revocationEntries.length,
             // @ts-ignore
-            data: options.revocationEntries.map((item) =>
-              RevocationEntryStruct({
-                def_entry_idx: item.revocationRegistryDefinitionEntryIndex,
-                entry: item.entry.handle,
-                timestamp: item.timestamp,
+            data: options.revocationEntries.map(({ revocationRegistryDefinitionEntryIndex, entry, timestamp }) => {
+              return RevocationEntryStruct({
+                def_entry_idx: revocationRegistryDefinitionEntryIndex,
+                entry: entry.handle,
+                timestamp: timestamp,
               })
-            ),
+            }),
           })
         : undefined
 
