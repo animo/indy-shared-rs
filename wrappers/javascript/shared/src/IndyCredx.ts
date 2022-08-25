@@ -64,7 +64,7 @@ export interface IndyCredx {
     revocationConfiguration?: NativeCredentialRevocationConfig
   }): { credential: ObjectHandle; revocationRegistry: ObjectHandle; revocationDelta: ObjectHandle }
 
-  encodeCredentialAttributes(attributeRawValues: Record<string, string>): Record<string, string>
+  encodeCredentialAttributes(options: { attributeRawValues: Array<string> }): Array<string>
 
   processCredential(options: {
     credential: ObjectHandle

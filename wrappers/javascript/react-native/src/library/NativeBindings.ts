@@ -35,7 +35,7 @@ export interface NativeBindings {
     attributeEncodedValues?: string
     revocationConfiguration?: NativeCredentialRevocationConfig
   }): { credential: _Handle; revocationRegistry: _Handle; revocationDelta: _Handle }
-  encodeCredentialAttributes(options: { attributeRawValues: string }): Record<string, string>
+  encodeCredentialAttributes(options: { attributeRawValues: Array<string> }): string
   processCredential(options: {
     credential: number
     credentialRequestMetadata: number

@@ -8,6 +8,7 @@ FunctionMap TurboModuleHostObject::functionMapping(jsi::Runtime &rt) {
   FunctionMap fMap;
 
   fMap.insert(std::make_tuple("version", &indyCredx::version));
+  fMap.insert(std::make_tuple("getCurrentError", &indyCredx::getCurrentError));
   fMap.insert(
       std::make_tuple("createCredential", &indyCredx::createCredential));
   fMap.insert(std::make_tuple("createCredentialDefinition",
@@ -28,16 +29,15 @@ FunctionMap TurboModuleHostObject::functionMapping(jsi::Runtime &rt) {
   fMap.insert(std::make_tuple("credentialDefinitionGetAttribute",
                               &indyCredx::credentialDefinitionGetAttribute));
   fMap.insert(std::make_tuple("credentialGetAttribute",
-                              &indyCredx::credentialGetAttribute));
+                                &indyCredx::credentialGetAttribute));
   fMap.insert(std::make_tuple("encodeCredentialAttributes",
                               &indyCredx::encodeCredentialAttributes));
   fMap.insert(std::make_tuple("generateNonce", &indyCredx::generateNonce));
-  fMap.insert(std::make_tuple("getCurrentError", &indyCredx::getCurrentError));
   fMap.insert(std::make_tuple("mergeRevocationRegistryDeltas",
                               &indyCredx::mergeRevocationRegistryDeltas));
-  fMap.insert(std::make_tuple("objectGetJson", &indyCredx::objectGetJson));
+  fMap.insert(std::make_tuple("getJson", &indyCredx::getJson));
   fMap.insert(
-      std::make_tuple("objectGetTypeName", &indyCredx::objectGetTypeName));
+      std::make_tuple("getTypeName", &indyCredx::getTypeName));
   fMap.insert(
       std::make_tuple("processCredential", &indyCredx::processCredential));
   fMap.insert(
