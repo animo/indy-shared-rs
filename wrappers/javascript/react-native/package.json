@@ -1,6 +1,6 @@
 {
   "name": "indy-credx-react-native",
-  "version": "0.0.3",
+  "version": "0.0.0",
   "license": "Apache-2.0",
   "description": "React Native wrapper for Indy Credx",
   "main": "build/index",

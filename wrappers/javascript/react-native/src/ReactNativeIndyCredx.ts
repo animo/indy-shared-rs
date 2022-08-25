@@ -72,8 +72,9 @@ export class ReactNativeIndyCredx implements IndyCredx {
     }
   }
 
-  public encodeCredentialAttributes(attributeRawValues: Record<string, string>): Record<string, string> {
-    return indyCredxReactNative.encodeCredentialAttributes(serializeArguments({ attributeRawValues }))
+  public encodeCredentialAttributes(options: { attributeRawValues: Array<string> }): Array<string> {
+    const s = indyCredxReactNative.encodeCredentialAttributes(serializeArguments(options))
+    return s.split(',')
   }
 
   public processCredential(options: {

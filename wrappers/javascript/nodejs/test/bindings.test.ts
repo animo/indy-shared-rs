@@ -90,12 +90,14 @@ describe('bindings', () => {
   })
 
   test('encode credential attributes', () => {
-    const encoded = indyCredx.encodeCredentialAttributes({ key1: 'value2', key2: 'value1' })
+    const encoded = indyCredx.encodeCredentialAttributes({ attributeRawValues: ['value2', 'value1'] })
 
-    expect(encoded).toEqual({
-      key1: '2360207505573967335061705667247358223962382058438765247085581582985596391831',
-      key2: '27404702143883897701950953229849815393032792099783647152371385368148256400014',
-    })
+    expect(encoded).toEqual(
+      expect.arrayContaining([
+        '2360207505573967335061705667247358223962382058438765247085581582985596391831',
+        '27404702143883897701950953229849815393032792099783647152371385368148256400014',
+      ])
+    )
   }),
     test('create revocation registry', () => {
       const schemaObj = indyCredx.createSchema({

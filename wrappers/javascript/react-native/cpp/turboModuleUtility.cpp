@@ -29,8 +29,7 @@ void handleError(jsi::Runtime &rt, ErrorCode code) {
   if (code == ErrorCode::Success)
     return;
 
-  // jsi::Value errorMessage = indyCredx::getCurrentError(rt, jsi::Object(rt));
-  jsi::Value errorMessage;
+  jsi::Value errorMessage = indyCredx::getCurrentError(rt, jsi::Object(rt));
 
   jsi::Object JSON = rt.global().getPropertyAsObject(rt, "JSON");
   jsi::Function JSONParse = JSON.getPropertyAsFunction(rt, "parse");
@@ -261,7 +260,6 @@ jsiToValue<FfiList_FfiRevocationEntry>(jsi::Runtime &rt, jsi::Object &options, c
     auto len = arr.length(rt);
 
     auto revocationEntry = new FfiRevocationEntry[arrayMaxSize];
-    auto ret = FfiList_FfiRevocationEntry {.count=len, .data=revocationEntry};
       
     // TODO: error Handling
     for (int i = 0; i < len; i++) {
@@ -272,9 +270,10 @@ jsiToValue<FfiList_FfiRevocationEntry>(jsi::Runtime &rt, jsi::Object &options, c
       auto entry = jsiToValue<ObjectHandle>(rt, valueAsObject, "entry");
       auto timestamp = jsiToValue<int64_t>(rt, valueAsObject, "timestamp");
         
+      revocationEntry[i] = *new FfiRevocationEntry[sizeof(FfiRevocationEntry)];
       revocationEntry[i] = FfiRevocationEntry {.timestamp=timestamp, .entry=entry, .def_entry_idx=revocationRegistryDefinitionIndex};
     }
-    return ret;
+    return FfiList_FfiRevocationEntry {.count=len, .data=revocationEntry};
   }
 
   if (optional)
@@ -293,7 +292,6 @@ jsiToValue<FfiList_FfiCredentialEntry>(jsi::Runtime &rt, jsi::Object &options, c
     auto len = arr.length(rt);
 
     auto credentialEntry = new FfiCredentialEntry[arrayMaxSize];
-    auto ret = FfiList_FfiCredentialEntry {.count=len, .data=credentialEntry};
       
     // TODO: error Handling
     for (int i = 0; i < len; i++) {
@@ -305,11 +303,13 @@ jsiToValue<FfiList_FfiCredentialEntry>(jsi::Runtime &rt, jsi::Object &options, c
         auto revocationState =
             jsiToValue<ObjectHandle>(rt, valueAsObject, "revocationState");
 
+        credentialEntry[i] = *new FfiCredentialEntry[sizeof(FfiCredentialEntry)];
         credentialEntry[i] =  FfiCredentialEntry{.credential = credential,
                                   .timestamp = timestamp,
                                   .rev_state = revocationState};
     }
-    return ret;
+    
+      return FfiList_FfiCredentialEntry {.count=len, .data=credentialEntry};
   }
 
   if (optional)
@@ -327,8 +327,7 @@ jsiToValue<FfiList_FfiCredentialProve>(jsi::Runtime &rt, jsi::Object &options, c
     auto arr = value.asObject(rt).asArray(rt);
     auto len = arr.length(rt);
 
-    auto credentialProve = new FfiCredentialProve[arrayMaxSize];
-    auto ret = FfiList_FfiCredentialProve {.count=len, .data=credentialProve};
+    auto credentialProve = new FfiCredentialProve[len];
       
     // TODO: error Handling
     for (int i = 0; i < len; i++) {
@@ -340,12 +339,13 @@ jsiToValue<FfiList_FfiCredentialProve>(jsi::Runtime &rt, jsi::Object &options, c
         auto isPredicate = jsiToValue<int8_t>(rt, valueAsObject, "isPredicate");
         auto reveal = jsiToValue<int8_t>(rt, valueAsObject, "reveal");
 
+        credentialProve[i] = *new FfiCredentialProve[sizeof(FfiCredentialProve)];
         credentialProve[i] = FfiCredentialProve{.entry_idx = entryIndex,
                                   .is_predicate = isPredicate,
                                   .referent = referent.c_str(),
                                   .reveal = reveal};
     }
-    return ret;
+    return FfiList_FfiCredentialProve {.count=len, .data=credentialProve};
   }
 
   if (optional)
@@ -364,16 +364,16 @@ jsiToValue<FfiList_ObjectHandle>(jsi::Runtime &rt, jsi::Object &options, const c
     auto len = arr.length(rt);
 
     auto objectHandle = new ObjectHandle[arrayMaxSize];
-    auto ret = FfiList_ObjectHandle {.count=len, .data=objectHandle};
       
     // TODO: error Handling
     for (int i = 0; i < len; i++) {
       auto element = arr.getValueAtIndex(rt, i);
       auto valueAsNumber = element.asNumber();
 
-        objectHandle[i] = size_t(valueAsNumber);
+      objectHandle[i] = *new size_t[sizeof(valueAsNumber)];
+      objectHandle[i] = size_t(valueAsNumber);
     }
-    return ret;
+      return FfiList_ObjectHandle {.count=len, .data=objectHandle};
   }
 
   if (optional)
@@ -391,24 +391,24 @@ jsiToValue<FfiList_FfiStr>(jsi::Runtime &rt, jsi::Object &options, const char *n
     auto arr = value.asObject(rt).asArray(rt);
     auto len = arr.length(rt);
 
-    auto ffiStr = new FfiStr[arrayMaxSize];
-    auto ret = FfiList_FfiStr {.count=len, .data=ffiStr};
-      
-    // TODO: error Handling
+    char** ffiStr = new char*[len];
+    
     for (int i = 0; i < len; i++) {
-      auto element = arr.getValueAtIndex(rt, i);
-      auto valueAsString = element.asString(rt);
-      std::string s = valueAsString.utf8(rt);
-
-      ffiStr[i] = s.c_str();
+      // TODO: check if string first
+      jsi::Value element = arr.getValueAtIndex(rt, i);
+      std::string s = element.asString(rt).utf8(rt);
+      ffiStr[i] = new char[sizeof(s)];
+      strcpy(ffiStr[i], s.c_str());
     }
-    return ret;
+    
+    return FfiList_FfiStr {.count=len, .data=ffiStr};
   }
 
-  if (optional)
+  if (optional) {
       return FfiList_FfiStr {};
+  }
 
-  throw jsi::JSError(rt, errorPrefix + name + errorInfix + "Array<number>");
+  throw jsi::JSError(rt, errorPrefix + name + errorInfix + "Array<string>");
 }
 
 template <>
@@ -421,16 +421,17 @@ jsiToValue<FfiList_i64>(jsi::Runtime &rt, jsi::Object &options, const char *name
     auto len = arr.length(rt);
 
     auto num = new int64_t[arrayMaxSize];
-    auto ret = FfiList_i64 {.count=len, .data=num};
       
     // TODO: error Handling
     for (int i = 0; i < len; i++) {
       auto element = arr.getValueAtIndex(rt, i);
       auto valueAsNumber = element.asNumber();
 
+      num[i] = *new int64_t[sizeof(valueAsNumber)];
       num[i] = int64_t(valueAsNumber);
     }
-    return ret;
+      
+    return FfiList_i64 {.count=len, .data=num};
   }
 
   if (optional)

@@ -217,27 +217,18 @@ export class NodeJSIndyCredx implements IndyCredx {
     }
   }
 
-  public encodeCredentialAttributes(attributeRawValues: Record<string, string>): Record<string, string> {
-    const rawValues = StringListStruct({
-      count: Object.keys(attributeRawValues).length,
-      // @ts-ignore
-      data: Object.values(attributeRawValues),
-    })
+  public encodeCredentialAttributes(options: { attributeRawValues: Array<string> }): Array<string> {
+    const { attributeRawValues } = serializeArguments(options)
 
     const ret = allocateStringBuffer()
 
     // @ts-ignore
-    nativeIndyCredx.credx_encode_credential_attributes(rawValues, ret)
+    nativeIndyCredx.credx_encode_credential_attributes(attributeRawValues, ret)
     handleError()
 
     const result = ret.deref() as string
 
-    const keys = Object.keys(attributeRawValues)
-    const values = result.split(',')
-
-    const output: Record<string, string> = {}
-    keys.forEach((key, i) => (output[key] = values[i]))
-    return output
+    return result.split(',')
   }
 
   public processCredential(options: {
