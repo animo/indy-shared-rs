@@ -332,13 +332,14 @@ describe('bindings', () => {
   })
 
   test('create and verify presentation', () => {
-    const timestamp = new Date().getUTCDate()
+    const timestamp = Math.floor(Date.now() / 1000)
+    const nonce = indyCredx.generateNonce()
 
     const presRequestObj = indyCredx.presentationRequestFromJson({
       json: JSON.stringify({
         name: 'proof',
         version: '1.0',
-        nonce: '1234',
+        nonce,
         requested_attributes: {
           reft: {
             name: 'attr-1',
@@ -382,7 +383,7 @@ describe('bindings', () => {
     const masterSecret = indyCredx.createMasterSecret()
     const masterSecretId = 'master secret id'
 
-    const { credentialRequest } = indyCredx.createCredentialRequest({
+    const { credentialRequest, credentialRequestMeta } = indyCredx.createCredentialRequest({
       proverDid: TEST_DID,
       credentialDefinition,
       masterSecret,
@@ -420,8 +421,16 @@ describe('bindings', () => {
       },
     })
 
+    const credentialReceived = indyCredx.processCredential({
+      credential,
+      credentialDefinition,
+      credentialRequestMetadata: credentialRequestMeta,
+      masterSecret,
+      revocationRegistryDefinition: registryDefinition,
+    })
+
     const revRegIndex = indyCredx.credentialGetAttribute({
-      objectHandle: credential,
+      objectHandle: credentialReceived,
       name: 'rev_reg_index',
     })
 
@@ -439,7 +448,7 @@ describe('bindings', () => {
       presentationRequest: presRequestObj,
       credentials: [
         {
-          credential,
+          credential: credentialReceived,
           revocationState,
           timestamp,
         },
@@ -473,6 +482,6 @@ describe('bindings', () => {
       schemas: [schemaObj],
     })
 
-    expect(verify).toBeFalsy()
+    expect(verify).toBeTruthy()
   })
 })
